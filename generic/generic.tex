@@ -71,12 +71,42 @@
 
 %%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\headline{{\hss}}
+\newif\ifheadline \headlinetrue
+
+\def\thispagenoheadline{\global\headlinefalse}
+
+\headline{%
+	\ifheadline
+		\ifodd\pageno
+			\hss{\normalsize\rm \defaultcolor [Recto header]}\hss% recto
+		\else
+			\hss{\normalsize\rm \defaultcolor [Verso header]}\hss% verso	
+		\fi
+	\else
+		\hss
+		\global\headlinetrue	
+	\fi
+}
 
 
 %%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\footline{\hss {\normalsize\rm \defaultcolor \folio} \hss}
+\newif\iffootline \footlinetrue
+
+\def\thispagenofootline{\global\footlinefalse}
+
+\footline{%
+	\iffootline
+		\ifodd\pageno
+			\hss{\normalsize\rm \defaultcolor \folio}% recto
+		\else
+			{\normalsize\rm \defaultcolor \folio}\hss% verso	
+		\fi
+	\else
+		\hss
+		\global\footlinetrue	
+	\fi
+}
 
 
 %%%%%%%%%% C O L O R S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,13 +114,13 @@
 % Token for \aftergroup to reset color
 \def\colorstackpop{\pdfextension colorstack 0 pop}
 
-% Switch to CMYK color. Expects four values between 0 and 1
+% Switch to CMYK color in current group. Expects four values between 0 and 1
 \def\setcmykcolor#1{%
    	\pdfextension colorstack 0 push {#1 k #1 K}% 
    	\aftergroup\colorstackpop
 }
 
-% Switch to RGB color. Expects three values between 0 and 1
+% Switch to RGB color in current group. Expects three values between 0 and 1
 \def\setrgbcolor#1{%
    	\pdfextension colorstack 0 push {#1 rg #1 RG}% 
    	\aftergroup\colorstackpop
@@ -122,7 +152,7 @@
             \ifdim\imageheight=0pt \else height\imageheight\fi 
             {\the\imagedir#1}%
       	\useimageresource\lastsavedimageresourceindex
-     }%
+	}%
 }
 
 % Example: {\imageheight=4cm \image{mypicture.png}}
@@ -144,8 +174,13 @@ Lorem {\bigsize\rm ipsum} dolor sit amet.
 
 \image{blue.png}
 
+\thispagenofootline
+
 \vskip\baselineskip
 
 {\imageheight2cm \imagewidth4cm \image{blue.png}}
+
+
+\input lipsum
 
 \bye
