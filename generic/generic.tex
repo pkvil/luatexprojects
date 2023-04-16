@@ -1,3 +1,8 @@
+%%
+%% Personal plain TeX macros.
+%% Can only be used with LuaTeX, requires luaotfload.sty in a searchable path.
+%%
+
 %%%%%%%%% F O N T S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Use font loader from ConTeXt
@@ -79,12 +84,13 @@
 % Token for \aftergroup to reset color
 \def\colorstackpop{\pdfextension colorstack 0 pop}
 
-% 
+% Switch to CMYK color. Expects four values between 0 and 1
 \def\setcmykcolor#1{%
    	\pdfextension colorstack 0 push {#1 k #1 K}% 
    	\aftergroup\colorstackpop
 }
 
+% Switch to RGB color. Expects three values between 0 and 1
 \def\setrgbcolor#1{%
    	\pdfextension colorstack 0 push {#1 rg #1 RG}% 
    	\aftergroup\colorstackpop
@@ -100,12 +106,14 @@
 \def\hyperlinkcolor{\blue}
 \def\rubricationcolor{\red}
 
+% Example: {\blue This is blue text}
+
 
 %%%%%%%%% I M A G E S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newdimen\imagewidth    \imagewidth=0pt 	% 0pt gives natural size of image
 \newdimen\imageheight   \imageheight=0pt
-\newtoks\imagedir 		\imagedir{} 		% Must end with /, e.g. mypics/
+\newtoks\imagedir		\imagedir{} 		% Must end with /, e.g. mypics/
 
 \def\image#1{%
 	\hbox{%
