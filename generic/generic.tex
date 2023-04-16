@@ -1,0 +1,143 @@
+%%%%%%%%% F O N T S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Use font loader from ConTeXt
+\input luaotfload.sty
+
+% Font names
+\font\tenrm "EBGaramond-Regular" at 10pt\relax
+\font\tenit "EBGaramond-Italic" at 10pt\relax
+
+\font\twelverm "EBGaramond-Regular" at 12pt\relax
+\font\twelveit "EBGaramond-Italic" at 12pt\relax
+
+% Semantic names for direct use
+\def\normalsize{%
+	\gdef\rm{\tenrm}%
+	\gdef\it{\tenit}%
+}
+
+\def\bigsize{%
+	\gdef\rm{\twelverm}%
+	\gdef\it{\twelveit}%
+}
+
+% Use italics for emphasis
+\let\emph\it
+
+% Start with normalsize roman
+\normalsize\rm
+
+
+%%%%%%%%% P A R A G R A P H   S E T T I N G S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Default distance between lines
+\baselineskip=15pt
+
+% No extra space after periods.
+\frenchspacing
+
+% Vertical distance between paragraphs
+\parskip=0pt
+
+% Paragraph indentation
+\parindent=1em
+
+% Allow some looseness if needed
+\emergencystretch=8pt
+
+%%%%%%%%% P A G E   L A Y O U T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Paper size
+\pagewidth=210mm	
+\pageheight=297mm
+
+% Undo legacy 1in origin
+\pdfvariable horigin 0in	
+\pdfvariable vorigin 0in
+
+% Typeset area distance from top left corner
+\hoffset=20mm	
+\voffset=20mm
+
+% Typeset area size
+\hsize=120mm	
+\vsize=\topskip \advance\vsize by 30\baselineskip
+
+
+%%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\headline{{\hss}}
+
+
+%%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\footline{\hss {\normalsize\rm \defaultcolor \folio} \hss}
+
+
+%%%%%%%%%% C O L O R S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Token for \aftergroup to reset color
+\def\colorstackpop{\pdfextension colorstack 0 pop}
+
+% 
+\def\setcmykcolor#1{%
+   	\pdfextension colorstack 0 push {#1 k #1 K}% 
+   	\aftergroup\colorstackpop
+}
+
+\def\setrgbcolor#1{%
+   	\pdfextension colorstack 0 push {#1 rg #1 RG}% 
+   	\aftergroup\colorstackpop
+}
+
+% Color names
+\def\black{\setcmykcolor{0 0 0 1}}
+\def\blue{\setcmykcolor{1 1 0 0}}
+\def\red{\setrgbcolor{1 0 0}}
+
+% Semantic names for direct use
+\def\defaultcolor{\black}
+\def\hyperlinkcolor{\blue}
+\def\rubricationcolor{\red}
+
+
+%%%%%%%%% I M A G E S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newdimen\imagewidth    \imagewidth=0pt 	% 0pt gives natural size of image
+\newdimen\imageheight   \imageheight=0pt
+\newtoks\imagedir 		\imagedir{} 		% Must end with /, e.g. mypics/
+
+\def\image#1{%
+	\hbox{%
+		\saveimageresource 
+			\ifdim\imagewidth=0pt \else width\imagewidth\fi 
+            \ifdim\imageheight=0pt \else height\imageheight\fi 
+            {\the\imagedir#1}%
+      	\useimageresource\lastsavedimageresourceindex
+     }%
+}
+
+% Example: {\imageheight=4cm \image{mypicture.png}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%         C O N T E N T
+          
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Test text:
+
+Lorem {\rubricationcolor ipsum} 
+{\hyperlinkcolor dolor {\defaultcolor sit} amet}.
+
+Lorem {\emph ipsum} dolor sit amet.
+
+Lorem {\bigsize\rm ipsum} dolor sit amet.
+
+\image{blue.png}
+
+\vskip\baselineskip
+
+{\imageheight2cm \imagewidth4cm \image{blue.png}}
+
+\bye
