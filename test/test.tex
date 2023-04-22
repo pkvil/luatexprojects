@@ -1,0 +1,70 @@
+\widowpenalty=0
+\clubpenalty=0
+
+\hsize=90mm
+\vsize=\topskip \advance\vsize by 4\baselineskip
+
+
+
+\def\adjustpage#1#2{%
+	\expandafter\xdef\csname a:#1\endcsname{#2}
+	\ifnum #1=1
+		\setvsize
+	\fi
+}
+
+\newdimen\originalvsize \originalvsize=\vsize
+
+\def\setvsize{%
+	\global\vsize=\originalvsize
+	\ifcsname a:\the\pageno\endcsname
+		\global\advance \vsize by \csname a:\the\pageno\endcsname \baselineskip
+	\fi
+}
+
+\adjustpage{1}{+3}
+\adjustpage{2}{-}
+\adjustpage{4}{+2}
+\adjustpage{5}{-}
+
+
+
+\output={\beforeoutput \plainoutput \afteroutput}
+
+\def\beforeoutput{}
+\def\afteroutput{\setvsize}
+
+Test
+
+\def\testifthree#1{%
+	\ifnum #1=3
+		is three!
+	\else
+		is not three ...
+	\fi
+}
+
+\testifthree2
+
+\testifthree3
+
+
+\input lipsum
+
+
+%Original: \the\originalvsize
+
+%Current: \the\vsize
+
+%---
+
+%\setvsize
+
+%Original: \the\originalvsize
+
+%Current: \the\vsize
+
+
+
+
+\bye

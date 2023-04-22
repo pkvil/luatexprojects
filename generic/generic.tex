@@ -3,6 +3,7 @@
 %% Can only be used with LuaTeX, requires luaotfload.sty in a searchable path.
 %%
 
+
 %%%%%%%%% F O N T S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Use font loader from ConTeXt
@@ -11,19 +12,23 @@
 % Font names
 \font\tenrm "EBGaramond-Regular" at 10pt\relax
 \font\tenit "EBGaramond-Italic" at 10pt\relax
+\font\tensc "EBGaramond-Regular":+pcap,letterspace=6; at 10pt\relax
 
 \font\twelverm "EBGaramond-Regular" at 12pt\relax
 \font\twelveit "EBGaramond-Italic" at 12pt\relax
+\font\twelvesc "EBGaramond-Regular":+pcap,letterspace=6; at 12pt\relax
 
 % Semantic names for direct use
 \def\normalsize{%
 	\gdef\rm{\tenrm}%
 	\gdef\it{\tenit}%
+	\gdef\sc{\tensc}%
 }
 
 \def\bigsize{%
 	\gdef\rm{\twelverm}%
 	\gdef\it{\twelveit}%
+	\gdef\sc{\twelvesc}%
 }
 
 % Use italics for emphasis
@@ -50,30 +55,56 @@
 % Allow some looseness if needed
 \emergencystretch=8pt
 
+% \firstnoindent -- Don't indent next paragraph
+\def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
+\def\wipeeverypar{\global\everypar={}}
+
 %%%%%%%%% P A G E   L A Y O U T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Paper size
-\pagewidth=210mm	
-\pageheight=297mm
+\pagewidth=180mm	
+\pageheight=200mm
 
 % Undo legacy 1in origin
 \pdfvariable horigin 0in	
 \pdfvariable vorigin 0in
 
 % Typeset area distance from top left corner
-\hoffset=20mm	
-\voffset=20mm
+\hoffset=15mm	
+\voffset=15mm
+
+% Ensure that first baseline starts at the same distance from the top
+\topskip=\baselineskip
 
 % Typeset area size
 \hsize=120mm	
-\vsize=\topskip \advance\vsize by 30\baselineskip
+\vsize=\topskip \advance\vsize by 4\baselineskip
+
+
+% Macro to lengthen or shorten pages by lines
+\newdimen\originalvsize \originalvsize=\vsize
+
+% Example, adjust page 15 to be 2 lines longer: \adjustpage{15}{+2}
+% Defines a macro \ap:<pageno>, expands to how many lines should be adjusted.
+\def\adjustpage#1#2{%
+	\expandafter\xdef\csname ap:#1\endcsname{#2}
+	\ifnum #1=1
+		\setvsize
+	\fi
+}
+
+% This macro gets expanded last in the output routine
+\def\setvsize{%
+	\global\vsize=\originalvsize
+	\ifcsname ap:\the\pageno\endcsname
+		\global\advance \vsize by \csname ap:\the\pageno\endcsname \baselineskip
+	\fi
+}
 
 
 %%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newif\ifheadline \headlinetrue
-
-\def\thispagenoheadline{\global\headlinefalse}
 
 \headline{%
 	\ifheadline
@@ -88,12 +119,13 @@
 	\fi
 }
 
+% Turn off headline on current page
+\def\thispagenoheadline{\global\headlinefalse}
+
 
 %%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newif\iffootline \footlinetrue
-
-\def\thispagenofootline{\global\footlinefalse}
 
 \footline{%
 	\iffootline
@@ -107,6 +139,9 @@
 		\global\footlinetrue	
 	\fi
 }
+
+% Turn off footline on current page
+\def\thispagenofootline{\global\footlinefalse}
 
 
 %%%%%%%%%% C O L O R S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,7 +171,7 @@
 \def\hyperlinkcolor{\blue}
 \def\rubricationcolor{\red}
 
-% Example: {\blue This is blue text}
+% Example: {\hyperlinkcolor This is blue text}
 
 
 %%%%%%%%% I M A G E S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -157,30 +192,36 @@
 
 % Example: {\imageheight=4cm \image{mypicture.png}}
 
+%%%%%%%%% O U T P U T   R O U T I N E %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\output{\beforeoutput \plainoutput \afteroutput}
+
+\def\beforeoutput{%
+	% Two page layout
+	\ifodd\pageno
+		\hoffset=15mm
+	\else
+		\hoffset=45mm
+	\fi
+}
+
+\def\afteroutput{%
+	\setvsize
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %         C O N T E N T
           
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Test text:
-
-Lorem {\rubricationcolor ipsum} 
-{\hyperlinkcolor dolor {\defaultcolor sit} amet}.
-
-Lorem {\emph ipsum} dolor sit amet.
-
-Lorem {\bigsize\rm ipsum} dolor sit amet.
-
-\image{blue.png}
-
-\thispagenofootline
-
-\vskip\baselineskip
-
-{\imageheight2cm \imagewidth4cm \image{blue.png}}
+\adjustpage{2}{+2}
+\adjustpage{5}{-1}
 
 
+\input lipsum
+\input lipsum
+\input lipsum
 \input lipsum
 
 \bye
