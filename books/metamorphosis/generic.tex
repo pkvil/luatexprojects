@@ -1,0 +1,289 @@
+%%
+%% Personal plain TeX macros.
+%% Can only be used with LuaTeX, requires luaotfload.sty in a searchable path,
+%% and the Pardo version EB Garamond files.
+%% Heavily inspired by OpTeX/OpMac.
+%%
+
+
+%%%%%%%%% F O N T S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Use font loader from ConTeXt
+\input luaotfload.sty
+
+% Font names
+\font\tenrm "EBGaramond-Regular":+onum; at 10pt\relax
+\font\tenit "EBGaramond-Italic" at 10pt\relax
+\font\tensc "EBGaramond-Regular":+pcap,letterspace=6; at 10pt\relax
+
+\font\twelverm "EBGaramond-Regular":+onum; at 12pt\relax
+\font\twelveit "EBGaramond-Italic" at 12pt\relax
+\font\twelvesc "EBGaramond-Regular":+smcp,letterspace=6; at 12pt\relax
+
+% Semantic names for direct use
+\def\normalsize{%
+	\gdef\rm{\tenrm}%
+	\gdef\it{\tenit}%
+	\gdef\sc{\tensc}%
+}
+
+\def\headingIsize{%
+	\gdef\rm{\twelverm}%
+	\gdef\it{\twelveit}%
+	\gdef\sc{\twelvesc}%
+}
+
+% Use italics for emphasis
+\let\emph\it
+
+% Start with normalsize roman
+\normalsize\rm
+
+
+%%%%%%%%% P A R A G R A P H   S E T T I N G S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Default distance between lines
+\baselineskip=15pt
+
+% No extra space after periods.
+\frenchspacing
+
+% Vertical distance between paragraphs
+\parskip=0pt
+
+% Paragraph indentation
+\parindent=1em
+
+% Allow some looseness if needed
+\emergencystretch=8pt
+
+% \firstnoindent -- Don't indent next paragraph
+\def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
+\def\wipeeverypar{\global\everypar={}}
+
+% No penalties for widows and orphans, these are dealt with using \adjustpage
+\widowpenalty=0
+\clubpenalty=0
+
+%%%%%%%%% P A G E   L A Y O U T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Paper size
+\pagewidth=148mm	
+\pageheight=210mm
+
+% Undo legacy 1in origin
+\pdfvariable horigin 0in	
+\pdfvariable vorigin 0in
+
+% Typeset area distance from top left corner
+\hoffset=16.444mm	
+\voffset=16.444mm
+
+% Ensure that first baseline starts at the same distance from the top
+\topskip=\baselineskip % I had an idea with this but forgot, leaving it in for now.
+
+% Typeset area size
+\hsize=98.666mm	
+\vsize=\topskip \advance\vsize by 29\baselineskip
+
+
+% Backup original vsize 
+\newdimen\originalvsize \originalvsize=\vsize
+
+% Defines a macro \ap:<pageno>, expands to how many lines should be adjusted.
+\def\adjustpage#1#2{%
+	\expandafter\xdef\csname ap:#1\endcsname{#2}
+	\ifnum #1=1
+		\setvsize
+	\fi
+}
+% Example: \adjustpage{15}{+2} adjusts page 15 to have 2 extra lines
+
+% This macro gets expanded last in the output routine, don't use directly.
+\def\setvsize{%
+	\global\vsize=\originalvsize
+	\ifcsname ap:\the\pageno\endcsname
+		\global\advance \vsize by \csname ap:\the\pageno\endcsname \baselineskip
+	\fi
+}
+
+
+%%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newif\ifheadline \headlinetrue
+
+\headline{%
+	\ifheadline
+		\ifodd\pageno
+			\hss \normalsize\sc \defaultcolor 
+			\lowercase{Name of the book} \hss% recto
+		\else
+			\hss \normalsize\sc \defaultcolor 
+			\lowercase{Author Authorsson}\hss% verso	
+		\fi
+	\else
+		\hss
+		\global\headlinetrue	
+	\fi
+}
+
+% Turn off headline on current page
+\def\thispagenoheadline{\global\headlinefalse}
+
+
+%%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newif\iffootline \footlinetrue
+
+\footline{%
+	\iffootline
+		\ifodd\pageno
+			\hss{\normalsize\rm \defaultcolor \folio\quad}% recto
+		\else
+			{\quad \normalsize\rm \defaultcolor \folio}\hss% verso	
+		\fi
+	\else
+		\hss
+		\global\footlinetrue	
+	\fi
+}
+
+% Turn off footline on current page
+\def\thispagenofootline{\global\footlinefalse}
+
+
+%%%%%%%%%% C O L O R S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Token for \aftergroup to reset color
+\def\colorstackpop{\pdfextension colorstack 0 pop}
+
+% Switch to CMYK color in current group. Expects four values between 0 and 1
+\def\setcmykcolor#1{%
+   	\pdfextension colorstack 0 push {#1 k #1 K}% 
+   	\aftergroup\colorstackpop
+}
+
+% Switch to RGB color in current group. Expects three values between 0 and 1
+\def\setrgbcolor#1{%
+   	\pdfextension colorstack 0 push {#1 rg #1 RG}% 
+   	\aftergroup\colorstackpop
+}
+
+% Color names
+\def\black{\setcmykcolor{0 0 0 1}}
+\def\blue{\setcmykcolor{1 1 0 0}}
+\def\red{\setrgbcolor{1 0 0}}
+
+% Semantic names for direct use
+\def\defaultcolor{\black}
+\def\hyperlinkcolor{\blue}
+\def\rubricationcolor{\red}
+
+% Example: {\hyperlinkcolor This is blue text}
+
+
+%%%%%%%%% I M A G E S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newdimen\imagewidth    \imagewidth=0pt 	% 0pt gives natural size of image
+\newdimen\imageheight   \imageheight=0pt
+\newtoks\imagedir		\imagedir{} 		% Must end with /, e.g. mypics/
+
+\def\image#1{%
+	\hbox{%
+		\saveimageresource 
+			\ifdim\imagewidth=0pt \else width\imagewidth\fi 
+            \ifdim\imageheight=0pt \else height\imageheight\fi 
+            {\the\imagedir#1}%
+      	\useimageresource\lastsavedimageresourceindex
+	}%
+}
+
+% Example: {\imageheight=4cm \image{mypicture.png}}
+
+%%%%%%%%% O U T P U T   R O U T I N E %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\output{\beforeoutput \plainoutput \afteroutput}
+
+% For two page layout, \shiftoffset is how much verso pages should move
+\newdimen\shiftoffset
+\shiftoffset = \pagewidth
+\advance \shiftoffset by -\hsize
+\advance \shiftoffset by -2\hoffset
+
+\def\beforeoutput{%
+	% Two page layout
+	\ifodd\pageno
+	\else
+		\advance \hoffset by \shiftoffset
+	\fi
+}
+
+\def\afteroutput{%
+	% Manually overriding vsize to solve widows through \adjustpage
+	\setvsize
+}
+
+%%%%%%%%% S E C T I O N I N G %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Heading level I
+\def\beginheadingI#1{%
+	% Start on a recto page
+	\ifodd\pageno
+	\else
+		\null\thispagenoheadline\vfill\eject
+	\fi
+	\thispagenoheadline
+	\centerline{\headingIsize\sc \lowercase{#1}}
+	\nobreak
+	\vskip 4\baselineskip
+	\nobreak
+	\firstnoindent
+}
+
+\def\endheadingI{\vfil\eject}
+
+% Heading level II
+\def\beginheadingII#1{%
+	\vskip\baselineskip \vskip 1ex
+	\centerline{\normalsize\it #1}
+	\nobreak
+	\vskip\baselineskip \vskip -1ex
+	\nobreak
+	\firstnoindent
+}
+
+\def\endheadingII{}
+
+% Semantic names
+
+\let\beginchapter = \beginheadingI
+\let\endchapter   = \endheadingI
+\let\beginsection = \beginheadingII
+\let\endsection   = \endheadingII
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%         C O N T E N T
+          
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\adjustpage{2}{+2}
+%\adjustpage{5}{-1}
+
+
+\beginchapter{First chapter}
+\input lipsum
+
+\beginsection{First section}
+\input lipsum
+\endsection
+
+\beginsection{Second section}
+\input lipsum
+\endsection
+\endchapter
+
+\beginchapter{Second chapter}
+\input lipsum
+\endchapter
+\bye
