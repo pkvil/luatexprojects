@@ -19,15 +19,24 @@
 \font\fourteenrm "Cochineal-Roman":+onum; at 14pt\relax
 \font\fourteenit "Cochineal-Italic" at 14pt\relax
 
+\font\eighteenrm "Cochineal-Roman":+onum,letterspace=8; at 18pt\relax
+\font\eighteenit "Cochineal-Italic" at 18pt\relax
+
+
 % Semantic names for direct use
 \def\normalsize{%
 	\gdef\rm{\elevenrm}%
 	\gdef\it{\elevenit}%
 }
 
-\def\titlesize{%
+\def\chaptersize{%
 	\gdef\rm{\fourteenrm}%
 	\gdef\it{\fourteenit}%
+}
+
+\def\titlesize{%
+	\gdef\rm{\eighteenrm}%
+	\gdef\it{\eighteenit}%
 }
 
 % Use italics for emphasis
@@ -51,7 +60,7 @@
 \parindent=1em
 
 % Allow some looseness if needed
-\emergencystretch=8pt
+\emergencystretch=10pt
 
 % \firstnoindent -- Don't indent next paragraph
 \def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
@@ -61,17 +70,94 @@
 \widowpenalty=0
 \clubpenalty=0
 
+
+%%%%%%%%% P A G E   L A Y O U T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Paper size
+\pagewidth=148mm	
+\pageheight=210mm
+
+% Undo legacy 1in origin
+\pdfvariable horigin 0in	
+\pdfvariable vorigin 0in
+
+% Typeset area distance from top left corner
+\hoffset=16.444mm	
+\voffset=16.444mm
+
+% Typeset area size
+\hsize=98.666mm	
+\vsize=\topskip \advance\vsize by 31\baselineskip
+
+
+%%%%%%%%% P A G E   A D J U S T M E N T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Backup original vsize 
+\newdimen\originalvsize \originalvsize=\vsize
+
+% Defines a macro \ap:<pageno>, expands to how many lines should be adjusted.
+\def\adjustpage#1#2{%
+	\expandafter\xdef\csname ap:#1\endcsname{#2}
+	\ifnum #1=1
+		\setvsize
+	\fi
+}
+% Example: \adjustpage{15}{+2} adjusts page 15 to have 2 extra lines
+
+% This macro gets expanded last in the output routine, don't use directly.
+\def\setvsize{%
+	\global\vsize=\originalvsize
+	\ifcsname ap:\the\pageno\endcsname
+		\global\advance \vsize by \csname ap:\the\pageno\endcsname \baselineskip
+	\fi
+}
+
+%%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newif\iffootline \footlinetrue
+
+\footline{%
+	\iffootline
+		\ifodd\pageno
+			\hss{\normalsize\rm \folio}\quad% recto
+		\else
+			\quad {\normalsize\rm \folio}\hss% verso	
+		\fi
+	\else
+		\hss
+		\global\footlinetrue	
+	\fi
+}
+
+% Turn off footline on current page
+\def\thispagenofootline{\global\footlinefalse}
+
+%%%%%%%%% S E C T I O N I N G %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\chapter#1{%
+	\vfil\break
+	\ifodd\pageno
+		\null\vfil\break
+	\fi
+	\centerline{\chaptersize\rm #1}
+	\vskip3\baselineskip
+	\firstnoindent
+}
+
 %%%%%%%%% C O N T E N T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-% T I T L E P A G E
-
-
-
-\centerline{I}
+% Begin Titlepage
+\thispagenofootline
+\leavevmode
 \vskip3\baselineskip
-\firstnoindent
+\centerline{\titlesize\rm METAMORPHOSIS}
+\vskip\baselineskip
+\centerline{\chaptersize\rm by}
+\vskip\baselineskip
+\centerline{\chaptersize\rm Franz Kafka}
+% End Titlepage 
 
+\chapter{I}
 
 One morning, when Gregor Samsa woke from troubled dreams, he found
 himself transformed in his bed into a horrible vermin. He lay on his
@@ -664,10 +750,7 @@ his room. The door was slammed shut with the stick, then, finally, all
 was quiet.
 
 
-
-
-II
-
+\chapter{II}
 
 It was not until it was getting dark that evening that Gregor awoke
 from his deep and coma-like sleep. He would have woken soon afterwards
@@ -1293,7 +1376,7 @@ his father’s head begging him to spare Gregor’s life.
 
 
 
-III
+\chapter{III}
 
 
 No-one dared to remove the apple lodged in Gregor’s flesh, so it
