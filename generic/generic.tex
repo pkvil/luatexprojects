@@ -110,6 +110,18 @@
 
 %%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\def\makeheadline{%
+	\vbox to0pt{%
+		\vskip-22.5pt
+  		\line{%
+  			\vbox to8.5pt{}%
+  			\the\headline
+  		}%
+  		\vss
+  	}
+	\nointerlineskip
+}
+
 \newif\ifheadline \headlinetrue
 
 \headline{%
@@ -132,6 +144,14 @@
 
 
 %%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\makefootline{%
+	\baselineskip=24pt
+	\lineskiplimit=0pt
+	\line{%
+		\the\footline
+	}%
+}
 
 \newif\iffootline \footlinetrue
 
