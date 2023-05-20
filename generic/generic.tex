@@ -110,7 +110,7 @@
 
 %%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\def\makeheadline{%
+\def\makeheadlineplain{%
 	\vbox to0pt{%
 		\vskip-22.5pt
   		\line{%
@@ -120,6 +120,19 @@
   		\vss
   	}
 	\nointerlineskip
+}
+
+\def\makeheadline{%
+    \vbox to0pt{%
+        \vss
+        \hbox to\hsize{%
+            \the\headline
+        }%
+        \vskip-\topskip
+        \vskip0.5\baselineskip % raise or lower from default
+        \hbox{}%
+    }%
+    \nointerlineskip
 }
 
 \newif\ifheadline \headlinetrue
@@ -281,6 +294,24 @@
 \let\beginsection = \beginheadingII
 \let\endsection   = \endheadingII
 
+
+%%%%%%%%% D R O P C A P S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\dropcapM{%
+\vskip2\baselineskip
+\smash{%
+    \hskip0pt
+    \raise 21pt \llap{\dcquotefont “\hskip0pt}%
+    {\dccapfont M}%
+}%
+\vskip-3\baselineskip
+\parshape 4
+    54pt \dimexpr(\hsize-54pt)
+    55pt \dimexpr(\hsize-55pt)
+    56pt \dimexpr(\hsize-56pt)
+    0pt \hsize
+\noindent
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %         C O N T E N T

@@ -15,6 +15,7 @@
 % Font names
 \font\elevenrm "Cochineal-Roman":+onum; at 11pt\relax
 \font\elevenit "Cochineal-Italic" at 11pt\relax
+\font\elevensc "Cochineal-Roman":+onum;smcp; at 11pt\relax
 
 \font\fourteenrm "Cochineal-Roman":+onum; at 14pt\relax
 \font\fourteenit "Cochineal-Italic" at 14pt\relax
@@ -27,6 +28,7 @@
 \def\normalsize{%
 	\gdef\rm{\elevenrm}%
 	\gdef\it{\elevenit}%
+	\gdef\sc{\elevensc}%
 }
 
 \def\chaptersize{%
@@ -48,7 +50,7 @@
 %%%%%%%%% P A R A G R A P H   S E T T I N G S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Default distance between lines
-\baselineskip=14pt
+\baselineskip=14.7pt
 
 % No extra space after periods.
 \frenchspacing
@@ -60,10 +62,10 @@
 \parindent=1em
 
 % Line breaking settings
-\emergencystretch=0pt
+\emergencystretch=1pt
 \pretolerance=150
-\tolerance=1502
-\hbadness=1502
+\tolerance=1552
+\hbadness=1552
 \hfuzz=0pt
 
 % \firstnoindent -- Don't indent next paragraph
@@ -78,20 +80,20 @@
 %%%%%%%%% P A G E   L A Y O U T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Paper size
-\pagewidth=148mm	
-\pageheight=210mm
+\pagewidth=136mm
+\pageheight=204mm
 
 % Undo legacy 1in origin
 \pdfvariable horigin 0in	
 \pdfvariable vorigin 0in
 
 % Typeset area distance from top left corner
-\hoffset=16.444mm	
-\voffset=16.444mm
+\hoffset=\dimexpr(\pagewidth/9)
+\voffset=\dimexpr((\pageheight/9)-\topskip+1ex)
 
 % Typeset area size
-\hsize=98.666mm	
-\vsize=\topskip \advance\vsize by 31\baselineskip
+\hsize=\dimexpr((\pagewidth/9)*6)
+\vsize=\topskip \advance\vsize by 26\baselineskip
 
 
 %%%%%%%%% P A G E   A D J U S T M E N T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,33 +118,48 @@
 	\fi
 }
 
-%
-\adjustpage{3}{+1}
+
+%\adjustpage{3}{+1}
 %\adjustpage{6}{+1} \adjustpage{7}{+1}
 
 
-%%% HEADER
+%%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \def\makeheadline{%
-  	\smash{%
-  		\vbox{%
-  			\smash{%
-  				\the\headline
-  			}%
-  			\vskip-\topskip 
-  			\vskip\baselineskip
-  		}%
-  	}%
-	\nointerlineskip
+    \vbox to0pt{%
+        \vss
+        \hbox to\hsize{%
+            \the\headline
+        }%
+        \vskip-\topskip
+        \vskip0.5\baselineskip % raise or lower from default
+        \hbox{}%
+    }%
+    \nointerlineskip
 }
 
-\headline{mnM\hfil}
+\newif\ifheadline \headlinetrue
+
+\headline{%
+	\ifheadline
+		\ifodd\pageno
+			\hfill{\normalsize\sc metamorphosis}\hfill% recto
+		\else
+			\hfill{\normalsize\sc franz kafka}\hfill% verso	
+		\fi
+	\else
+		\hss
+		\global\headlinetrue	
+	\fi
+}
+
+% Turn off headline on current page
+\def\thispagenoheadline{\global\headlinefalse}
 
 %%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \def\makefootline{%
-	%\baselineskip=24pt
-	%\vskip\baselineskip
+	\vskip0.5\baselineskip % adjust to move footline
 	\lineskiplimit=0pt
 	\line{%
 		\the\footline
@@ -154,9 +171,9 @@
 \footline{%
 	\iffootline
 		\ifodd\pageno
-			\hss{\normalsize\rm \folio}\quad% recto
+			\hss{\normalsize\rm \folio}\hskip\parindent% recto
 		\else
-			\quad {\normalsize\rm \folio}\hss% verso	
+			\hskip\parindent{\normalsize\rm \folio}\hss% verso	
 		\fi
 	\else
 		\hss
@@ -172,9 +189,10 @@
 \def\beginchapter#1{%
 	\ifodd\pageno
 	\else
-		\null\thispagenofootline
+		\null\thispagenofootline \thispagenoheadline
 		\vfil\break
 	\fi
+	\thispagenoheadline
 	\centerline{\chaptersize\rm #1}
 	\vskip3\baselineskip
 	\firstnoindent
@@ -188,13 +206,41 @@
 
 \output{\beforeoutput \plainoutput \afteroutput}
 
+
+
 % For two page layout, \shiftoffset is how much verso pages should move
 \newdimen\shiftoffset
 \shiftoffset = \pagewidth
 \advance \shiftoffset by -\hsize
 \advance \shiftoffset by -2\hoffset
 
+\newcount\tmpcount
+\newcount\signaturelength	\signaturelength=16 % Pages in a signature
+\newdimen\oldhoffset
+
+\def\adjustforcreep{%
+	% Find current page place in signature
+	\tmpcount=\pageno%
+	\divide\tmpcount by\signaturelength%
+	\multiply\tmpcount by\signaturelength%
+	\multiply\tmpcount by-1%
+	\advance\tmpcount by\pageno\relax%
+	% Adjust based on place in signature
+	\ifnum\tmpcount=1
+		\advance\hoffset by 2mm%
+	\fi
+	\ifnum \tmpcount=2
+		\advance\hoffset by 2mm%
+	\fi
+	\ifnum\tmpcount=3
+		\advance\hoffset by 1.5mm%
+	\fi
+	% Etc for all the pages in a signature
+}
+
 \def\beforeoutput{%
+	% Creep correction
+	\adjustforcreep
 	% Two page layout
 	\ifodd\pageno
 	\else
@@ -203,14 +249,41 @@
 }
 
 \def\afteroutput{%
+	% Reset \hoffset
+	\hoffset=\oldhoffset
 	% Manually overriding vsize to solve widows through \adjustpage
 	\setvsize
 }
 
+%%%%%%%%% I M A G E S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newdimen\imagewidth    \imagewidth=0pt 	% 0pt gives natural size of image
+\newdimen\imageheight   \imageheight=0pt
+\newtoks\imagedir		\imagedir{} 		% Must end with /, e.g. mypics/
+
+\def\image#1{%
+	\hbox{%
+		\saveimageresource 
+			\ifdim\imagewidth=0pt \else width\imagewidth\fi 
+            \ifdim\imageheight=0pt \else height\imageheight\fi 
+            {\the\imagedir#1}%
+      	\useimageresource\lastsavedimageresourceindex
+	}%
+}
+
+% Example: {\imageheight=4cm \image{mypicture.png}}
+
+% Testing the grid
+%\imagewidth=\pagewidth
+%\imageheight=\pageheight
+%\moveleft\hoffset
+%\vbox to 0pt{\vskip-\topskip\vskip-\voffset{\image{canon136mm204mm-1.pdf}}}
+%\vskip-\baselineskip
+
 %%%%%%%%% C O N T E N T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Begin Titlepage
-\thispagenofootline
+\thispagenofootline \thispagenoheadline
 \vglue3\baselineskip
 \centerline{\titlesize\rm METAMORPHOSIS}
 \vskip\baselineskip
@@ -221,14 +294,14 @@
 \centerline{Privately printed}
 \centerline{2023}
 \vfil\break
-\thispagenofootline
+
+\thispagenofootline \thispagenoheadline
 \null\vfil\break
 % End Titlepage 
 
 
 \beginchapter{I}
 
-\the\topskip
 One morning, when Gregor Samsa woke from troubled dreams, he found
 himself transformed in his bed into a horrible vermin. He lay on his
 armour-like back, and if he lifted his head a little he could see his
@@ -240,7 +313,7 @@ rest of him, waved about helplessly as he looked.
 “What’s happened to me?” he thought. It wasn’t a dream. His room, a
 proper human room although a little too small, lay peacefully between
 its four familiar walls. A collection of textile samples lay spread out
-on the table—Samsa was a travelling salesman—and above it there hung a
+on the table – Samsa was a travelling salesman – and above it there hung a
 picture that he had recently cut out of an illustrated magazine and
 housed in a nice, gilded frame. It showed a lady fitted out with a fur
 hat and fur boa who sat upright, raising a heavy fur muff that covered
@@ -285,8 +358,8 @@ off his desk! And it’s a funny sort of business to be sitting up there
 at your desk, talking down at your subordinates from up there,
 especially when you have to go right up close because the boss is hard
 of hearing. Well, there’s still some hope; once I’ve got the money
-together to pay off my parents’ debt to him—another five or six years I
-suppose—that’s definitely what I’ll do. That’s when I’ll make the big
+together to pay off my parents’ debt to him – another five or six years I
+suppose – that’s definitely what I’ll do. That’s when I’ll make the big
 change. First of all though, I’ve got to get up, my train leaves at
 five.”
 
@@ -318,8 +391,8 @@ completely well and even felt much hungrier than usual.
 
 He was still hurriedly thinking all this through, unable to decide to
 get out of the bed, when the clock struck quarter to seven. There was a
-cautious knock at the door near his head. “Gregor”, somebody called—it
-was his mother—“it’s quarter to seven. Didn’t you want to go
+cautious knock at the door near his head. “Gregor”, somebody called – it
+was his mother – “it’s quarter to seven. Didn’t you want to go
 somewhere?” That gentle voice! Gregor was shocked when he heard his own
 voice answering, it could hardly be recognised as the voice he had had
 before. As if from deep inside him, there was a painful and
@@ -418,11 +491,11 @@ it falling onto the carpet. His main concern was for the loud noise he
 was bound to make, and which even through all the doors would probably
 raise concern if not alarm. But it was something that had to be risked.
 
-When Gregor was already sticking half way out of the bed—the new method
+When Gregor was already sticking half way out of the bed – the new method
 was more of a game than an effort, all he had to do was rock back and
-forth—it occurred to him how simple everything would be if somebody
-came to help him. Two strong people—he had his father and the maid in
-mind—would have been more than enough; they would only have to push
+forth – it occurred to him how simple everything would be if somebody
+came to help him. Two strong people – he had his father and the maid in
+mind – would have been more than enough; they would only have to push
 their arms under the dome of his back, peel him away from the bed, bend
 down with the load and then be patient and careful as he swang over
 onto the floor, where, hopefully, the little legs would find a use.
@@ -440,15 +513,15 @@ For a moment everything remained quiet. “They’re not opening the door”,
 Gregor said to himself, caught in some nonsensical hope. But then of
 course, the maid’s firm steps went to the door as ever and opened it.
 Gregor only needed to hear the visitor’s first words of greeting and he
-knew who it was—the chief clerk himself. Why did Gregor have to be the
+knew who it was – the chief clerk himself. Why did Gregor have to be the
 only one condemned to work for a company where they immediately became
 highly suspicious at the slightest shortcoming? Were all employees,
 every one of them, louts, was there not one of them who was faithful
 and devoted who would go so mad with pangs of conscience that he
 couldn’t get out of bed if he didn’t spend at least a couple of hours
 in the morning on company business? Was it really not enough to let one
-of the trainees make enquiries—assuming enquiries were even
-necessary—did the chief clerk have to come himself, and did they have
+of the trainees make enquiries – assuming enquiries were even
+necessary – did the chief clerk have to come himself, and did they have
 to show the whole, innocent family that this was so suspicious that
 only the chief clerk could be trusted to have the wisdom to investigate
 it? And more because these thoughts had made him upset than through any
@@ -520,15 +593,15 @@ excuse their behaviour.
 The chief clerk now raised his voice, “Mr. Samsa”, he called to him,
 “what is wrong? You barricade yourself in your room, give us no more
 than yes or no for an answer, you are causing serious and unnecessary
-concern to your parents and you fail—and I mention this just by the
-way—you fail to carry out your business duties in a way that is quite
+concern to your parents and you fail – and I mention this just by the
+way – you fail to carry out your business duties in a way that is quite
 unheard of. I’m speaking here on behalf of your parents and of your
 employer, and really must request a clear and immediate explanation. I
 am astonished, quite astonished. I thought I knew you as a calm and
 sensible person, and now you suddenly seem to be showing off with
 peculiar whims. This morning, your employer did suggest a possible
-reason for your failure to appear, it’s true—it had to do with the
-money that was recently entrusted to you—but I came near to giving him
+reason for your failure to appear, it’s true – it had to do with the
+money that was recently entrusted to you – but I came near to giving him
 my word of honour that that could not be the right explanation. But now
 that I see your incomprehensible stubbornness I no longer feel any wish
 whatsoever to intercede on your behalf. And nor is your position all
@@ -559,8 +632,8 @@ wait, sir; I’ll be in the office soon after you, and please be so good
 as to tell that to the boss and recommend me to him!”
 
 And while Gregor gushed out these words, hardly knowing what he was
-saying, he made his way over to the chest of drawers—this was easily
-done, probably because of the practise he had already had in bed—where
+saying, he made his way over to the chest of drawers – this was easily
+done, probably because of the practise he had already had in bed – where
 he now tried to get himself upright. He really did want to open the
 door, really did want to let them see him and to speak with the chief
 clerk; the others were being so insistent, and he was curious to learn
@@ -595,12 +668,12 @@ awful has happened.
 
 Gregor, in contrast, had become much calmer. So they couldn’t
 understand his words any more, although they seemed clear enough to
-him, clearer than before—perhaps his ears had become used to the sound.
+him, clearer than before – perhaps his ears had become used to the sound.
 They had realised, though, that there was something wrong with him, and
 were ready to help. The first response to his situation had been
 confident and wise, and that made him feel better. He felt that he had
 been drawn back in among people, and from the doctor and the locksmith
-he expected great and surprising achievements—although he did not
+he expected great and surprising achievements – although he did not
 really distinguish one from the other. Whatever was said next would be
 crucial, so, in order to make his voice as clear as possible, he
 coughed a little, but taking care to do this not too loudly as even
@@ -615,8 +688,8 @@ there he let go of it and threw himself onto the door, holding himself
 upright against it using the adhesive on the tips of his legs. He
 rested there a little while to recover from the effort involved and
 then set himself to the task of turning the key in the lock with his
-mouth. He seemed, unfortunately, to have no proper teeth—how was he,
-then, to grasp the key?—but the lack of teeth was, of course, made up
+mouth. He seemed, unfortunately, to have no proper teeth – how was he,
+then, to grasp the key? – but the lack of teeth was, of course, made up
 for with a very strong jaw; using the jaw, he really was able to start
 the key turning, ignoring the fact that he must have been causing some
 kind of damage as a brown fluid came from his mouth, flowed over the
@@ -641,8 +714,8 @@ of the double doors, and he had to do it very carefully if he did not
 want to fall flat on his back before entering the room. He was still
 occupied with this difficult movement, unable to pay attention to
 anything else, when he heard the chief clerk exclaim a loud “Oh!”,
-which sounded like the soughing of the wind. Now he also saw him—he was
-the nearest to the door—his hand pressed against his open mouth and
+which sounded like the soughing of the wind. Now he also saw him – he was
+the nearest to the door – his hand pressed against his open mouth and
 slowly retreating as if driven by a steady and invisible force.
 Gregor’s mother, her hair still dishevelled from bed despite the chief
 clerk’s being there, looked at his father. Then she unfolded her arms,
@@ -658,7 +731,7 @@ other door which was still held bolted in place. In this way only half
 of his body could be seen, along with his head above it which he leant
 over to one side as he peered out at the others. Meanwhile the day had
 become much lighter; part of the endless, grey-black building on the
-other side of the street—which was a hospital—could be seen quite
+other side of the street – which was a hospital – could be seen quite
 clearly with the austere and regular line of windows piercing its
 façade; the rain was still falling, now throwing down large, individual
 droplets which hit the ground one at a time. The washing up from
@@ -692,7 +765,7 @@ an enormous wage as well as having a soft time of it. That’s just
 prejudice but they have no particular reason to think better of it. But
 you, sir, you have a better overview than the rest of the staff, in
 fact, if I can say this in confidence, a better overview than the boss
-himself—it’s very easy for a businessman like him to make mistakes
+himself – it’s very easy for a businessman like him to make mistakes
 about his employees and judge them more harshly than he should. And
 you’re also well aware that we travellers spend almost the whole year
 away from the office, so that we can very easily fall victim to gossip
@@ -730,8 +803,8 @@ surely she could persuade him; she would close the front door in the
 entrance hall and talk him out of his shocked state. But his sister was
 not there, Gregor would have to do the job himself. And without
 considering that he still was not familiar with how well he could move
-about in his present state, or that his speech still might not—or
-probably would not—be understood, he let go of the door; pushed himself
+about in his present state, or that his speech still might not – or
+probably would not – be understood, he let go of the door; pushed himself
 through the opening; tried to reach the chief clerk on the landing who,
 ridiculously, was holding on to the banister with both hands; but
 Gregor fell immediately over and, with a little scream as he sought
@@ -831,12 +904,12 @@ and the sound of the door leading into the front room being carefully
 shut had woken him. The light from the electric street lamps shone
 palely here and there onto the ceiling and tops of the furniture, but
 down below, where Gregor was, it was dark. He pushed himself over to
-the door, feeling his way clumsily with his antennae—of which he was
-now beginning to learn the value—in order to see what had been
+the door, feeling his way clumsily with his antennae – of which he was
+now beginning to learn the value – in order to see what had been
 happening there. The whole of his left side seemed like one, painfully
 stretched scar, and he limped badly on his two rows of legs. One of the
-legs had been badly injured in the events of that morning—it was nearly
-a miracle that only one of them had been—and dragged along lifelessly.
+legs had been badly injured in the events of that morning – it was nearly
+a miracle that only one of them had been – and dragged along lifelessly.
 
 It was only when he had reached the door that he realised what it
 actually was that had drawn him over to it; it was the smell of
@@ -846,8 +919,8 @@ pleased he almost laughed, as he was even hungrier than he had been
 that morning, and immediately dipped his head into the milk, nearly
 covering his eyes with it. But he soon drew his head back again in
 disappointment; not only did the pain in his tender left side make it
-difficult to eat the food—he was only able to eat if his whole body
-worked together as a snuffling whole—but the milk did not taste at all
+difficult to eat the food – he was only able to eat if his whole body
+worked together as a snuffling whole – but the milk did not taste at all
 nice. Milk like this was normally his favourite drink, and his sister
 had certainly left it there for him because of that, but he turned,
 almost against his own will, away from the dish and crawled back into
@@ -906,8 +979,8 @@ Gregor soon had the opportunity to test the strength of his decisions,
 as early the next morning, almost before the night had ended, his
 sister, nearly fully dressed, opened the door from the front room and
 looked anxiously in. She did not see him straight away, but when she
-did notice him under the couch—he had to be somewhere, for God’s sake,
-he couldn’t have flown away—she was so shocked that she lost control of
+did notice him under the couch – he had to be somewhere, for God’s sake,
+he couldn’t have flown away – she was so shocked that she lost control of
 herself and slammed the door shut again from outside. But she seemed to
 regret her behaviour, as she opened the door again straight away and
 came in on tip-toe as if entering the room of someone seriously ill or
@@ -920,8 +993,8 @@ although he did feel a terrible urge to rush forward from under the
 couch, throw himself at his sister’s feet and beg her for something
 good to eat. However, his sister noticed the full dish immediately and
 looked at it and the few drops of milk splashed around it with some
-surprise. She immediately picked it up—using a rag, not her bare
-hands—and carried it out. Gregor was extremely curious as to what she
+surprise. She immediately picked it up – using a rag, not her bare
+hands – and carried it out. Gregor was extremely curious as to what she
 would bring in its place, imagining the wildest possibilities, but he
 never could have guessed what his sister, in her goodness, actually did
 bring. In order to test his taste, she brought him a whole selection of
@@ -976,9 +1049,9 @@ and the locksmith that first morning to get them out of the flat. As
 nobody could understand him, nobody, not even his sister, thought that
 he could understand them, so he had to be content to hear his sister’s
 sighs and appeals to the saints as she moved about his room. It was
-only later, when she had become a little more used to everything—there
+only later, when she had become a little more used to everything – there
 was, of course, no question of her ever becoming fully used to the
-situation—that Gregor would sometimes catch a friendly comment, or at
+situation – that Gregor would sometimes catch a friendly comment, or at
 least a comment that could be construed as friendly. “He’s enjoyed his
 dinner today”, she might say when he had diligently cleared away all
 the food left for him, or if he left most of it, which slowly became
@@ -992,7 +1065,7 @@ whole body against it. There was seldom any conversation, especially at
 first, that was not about him in some way, even if only in secret. For
 two whole days, all the talk at every mealtime was about what they
 should do now; but even between meals they spoke about the same subject
-as there were always at least two members of the family at home—nobody
+as there were always at least two members of the family at home – nobody
 wanted to be at home by themselves and it was out of the question to
 leave the flat entirely empty. And on the very first day the maid had
 fallen to her knees and begged Gregor’s mother to let her go without
@@ -1080,8 +1153,8 @@ live off the interest; it was enough to maintain them for, perhaps, one
 or two years, no more. That’s to say, it was money that should not
 really be touched but set aside for emergencies; money to live on had
 to be earned. His father was healthy but old, and lacking in self
-confidence. During the five years that he had not been working—the
-first holiday in a life that had been full of strain and no success—he
+confidence. During the five years that he had not been working – the
+first holiday in a life that had been full of strain and no success – he
 had put on a lot of weight and become very slow and clumsy. Would
 Gregor’s elderly mother now have to go and earn money? She suffered
 from asthma and it was a strain for her just to move about the home,
@@ -1190,8 +1263,8 @@ happy, it might happen that he would surprise even himself by letting
 go of the ceiling and landing on the floor with a crash. But now, of
 course, he had far better control of his body than before and, even
 with a fall as great as that, caused himself no damage. Very soon his
-sister noticed Gregor’s new way of entertaining himself—he had, after
-all, left traces of the adhesive from his feet as he crawled about—and
+sister noticed Gregor’s new way of entertaining himself – he had, after
+all, left traces of the adhesive from his feet as he crawled about – and
 got it into her head to make it as easy as possible for him by removing
 the furniture that got in his way, especially the chest of drawers and
 the desk. Now, this was not something that she would be able to do by
@@ -1237,7 +1310,7 @@ time in between all the easier”.
 
 Hearing these words from his mother made Gregor realise that the lack
 of any direct human communication, along with the monotonous life led
-by the family during these two months, must have made him confused—he
+by the family during these two months, must have made him confused – he
 could think of no other way of explaining to himself why he had
 seriously wanted his room emptied out. Had he really wanted to
 transform his room into a cave, a warm room fitted out with the nice
@@ -1298,7 +1371,7 @@ everything that was dear to him; they had already taken out the chest
 containing his fretsaw and other tools; now they threatened to remove
 the writing desk with its place clearly worn into the floor, the desk
 where he had done his homework as a business trainee, at high school,
-even while he had been at infant school—he really could not wait any
+even while he had been at infant school – he really could not wait any
 longer to see whether the two women’s intentions were good. He had
 nearly forgotten they were there anyway, as they were now too tired to
 say anything while they worked and he could only hear their feet as
@@ -1307,8 +1380,8 @@ they stepped heavily on the floor.
 So, while the women were leant against the desk in the other room
 catching their breath, he sallied out, changed direction four times not
 knowing what he should save first before his attention was suddenly
-caught by the picture on the wall—which was already denuded of
-everything else that had been on it—of the lady dressed in copious fur.
+caught by the picture on the wall – which was already denuded of
+everything else that had been on it – of the lady dressed in copious fur.
 He hurried up onto the picture and pressed himself against its glass,
 it held him firmly and felt good on his hot belly. This picture at
 least, now totally covered by Gregor, would certainly be taken away by
@@ -1335,7 +1408,7 @@ as if she had given up everything and stayed there immobile. “Gregor!”
 shouted his sister, glowering at him and shaking her fist. That was the
 first word she had spoken to him directly since his transformation. She
 ran into the other room to fetch some kind of smelling salts to bring
-her mother out of her faint; Gregor wanted to help too—he could save
+her mother out of her faint; Gregor wanted to help too – he could save
 his picture later, although he stuck fast to the glass and had to pull
 himself off by force; then he, too, ran into the next room as if he
 could advise his sister like in the old days; but he had to just stand
@@ -1403,7 +1476,7 @@ trouser pockets, pushing back the bottom of his long uniform coat, and,
 with look of determination, walked towards Gregor. He probably did not
 even know himself what he had in mind, but nonetheless lifted his feet
 unusually high. Gregor was amazed at the enormous size of the soles of
-his boots, but wasted no time with that—he knew full well, right from
+his boots, but wasted no time with that – he knew full well, right from
 the first day of his new life, that his father thought it necessary to
 always be extremely strict with him. And so he ran up to his father,
 stopped when his father stopped, scurried forwards again when he moved,
@@ -1421,7 +1494,7 @@ running he could hardly keep his eyes open; his thoughts became too
 slow for him to think of any other way of saving himself than running;
 he almost forgot that the walls were there for him to use although,
 here, they were concealed behind carefully carved furniture full of
-notches and protrusions—then, right beside him, lightly tossed,
+notches and protrusions – then, right beside him, lightly tossed,
 something flew down and rolled in front of him. It was an apple; then
 another one immediately flew at him; Gregor froze in shock; there was
 no longer any point in running as his father had decided to bombard
@@ -1441,7 +1514,7 @@ off some of her clothes after she had fainted to make it easier for her
 to breathe), she ran to his father, her skirts unfastened and sliding
 one after another to the ground, stumbling over the skirts she pushed
 herself to his father, her arms around him, uniting herself with him
-totally—now Gregor lost his ability to see anything—her hands behind
+totally – now Gregor lost his ability to see anything – her hands behind
 his father’s head begging him to spare Gregor’s life.
 
 \endchapter
@@ -1456,16 +1529,16 @@ revolting form, was a family member who could not be treated as an
 enemy. On the contrary, as a family there was a duty to swallow any
 revulsion for him and to be patient, just to be patient.
 
-Because of his injuries, Gregor had lost much of his mobility—probably
+Because of his injuries, Gregor had lost much of his mobility – probably
 permanently. He had been reduced to the condition of an ancient invalid
-and it took him long, long minutes to crawl across his room—crawling
-over the ceiling was out of the question—but this deterioration in his
+and it took him long, long minutes to crawl across his room – crawling
+over the ceiling was out of the question – but this deterioration in his
 condition was fully (in his opinion) made up for by the door to the
 living room being left open every evening. He got into the habit of
 closely watching it for one or two hours before it was opened and then,
 lying in the darkness of his room where he could not be seen from the
 living room, he could watch the family in the light of the dinner table
-and listen to their conversation—with everyone’s permission, in a way,
+and listen to their conversation – with everyone’s permission, in a way,
 and thus quite differently from before.
 
 They no longer held the lively conversations of earlier times, of
@@ -1478,7 +1551,7 @@ fancy underwear for a fashion shop; his sister, who had taken a sales
 job, learned shorthand and French in the evenings so that she might be
 able to get a better position later on. Sometimes his father would wake
 up and say to Gregor’s mother “you’re doing so much sewing again
-today!”, as if he did not know that he had been dozing—and then he
+today!”, as if he did not know that he had been dozing – and then he
 would go back to sleep again while mother and sister would exchange a
 tired grin.
 
@@ -1555,7 +1628,7 @@ chief clerk, but they would appear again in his thoughts, the salesmen
 and the apprentices, that stupid teaboy, two or three friends from
 other businesses, one of the chambermaids from a provincial hotel, a
 tender memory that appeared and disappeared again, a cashier from a hat
-shop for whom his attention had been serious but too slow,—all of them
+shop for whom his attention had been serious but too slow, – all of them
 appeared to him, mixed together with strangers and others he had
 forgotten, but instead of helping him and his family they were all of
 them inaccessible, and he was glad when they disappeared. Other times
@@ -1568,7 +1641,7 @@ thought about how she could please him but would hurriedly push some
 food or other into his room with her foot before she rushed out to work
 in the morning and at midday, and in the evening she would sweep it
 away again with the broom, indifferent as to whether it had been eaten
-or—more often than not—had been left totally untouched. She still
+or – more often than not – had been left totally untouched. She still
 cleared up the room in the evening, but now she could not have been any
 quicker about it. Smears of dirt were left on the walls, here and there
 were little balls of dust and filth. At first, Gregor went into one of
@@ -1577,9 +1650,9 @@ but he could have stayed there for weeks without his sister doing
 anything about it; she could see the dirt as well as he could but she
 had simply decided to leave him to it. At the same time she became
 touchy in a way that was quite new for her and which everyone in the
-family understood—cleaning up Gregor’s room was for her and her alone.
+family understood – cleaning up Gregor’s room was for her and her alone.
 Gregor’s mother did once thoroughly clean his room, and needed to use
-several bucketfuls of water to do it—although that much dampness also
+several bucketfuls of water to do it – although that much dampness also
 made Gregor ill and he lay flat on the couch, bitter and immobile. But
 his mother was to be punished still more for what she had done, as
 hardly had his sister arrived home in the evening than she noticed the
@@ -1635,8 +1708,8 @@ he had soon got used to the changes made there. They had got into the
 habit of putting things into this room that they had no room for
 anywhere else, and there were now many such things as one of the rooms
 in the flat had been rented out to three gentlemen. These earnest
-gentlemen—all three of them had full beards, as Gregor learned peering
-through the crack in the door one day—were painfully insistent on
+gentlemen – all three of them had full beards, as Gregor learned peering
+through the crack in the door one day – were painfully insistent on
 things’ being tidy. This meant not only in their own room but, since
 they had taken a room in this establishment, in the entire flat and
 especially in the kitchen. Unnecessary clutter was something they could
@@ -1715,8 +1788,8 @@ therefore showed an exaggerated courtesy towards the three gentlemen,
 did not even dare to sit on their own chairs; his father leant against
 the door with his right hand pushed in between two buttons on his
 uniform coat; his mother, though, was offered a seat by one of the
-gentlemen and sat—leaving the chair where the gentleman happened to
-have placed it—out of the way in a corner.
+gentlemen and sat – leaving the chair where the gentleman happened to
+have placed it – out of the way in a corner.
 
 His sister began to play; father and mother paid close attention, one
 on each side, to the movements of her hands. Drawn in by the playing,
@@ -1761,8 +1834,8 @@ attackers; his sister should not be forced to stay with him, though,
 but stay of her own free will; she would sit beside him on the couch
 with her ear bent down to him while he told her how he had always
 intended to send her to the conservatory, how he would have told
-everyone about it last Christmas—had Christmas really come and gone
-already?—if this misfortune hadn’t got in the way, and refuse to let
+everyone about it last Christmas – had Christmas really come and gone
+already? – if this misfortune hadn’t got in the way, and refuse to let
 anyone dissuade him from it. On hearing all this, his sister would
 break out in tears of emotion, and Gregor would climb up to her
 shoulder and kiss her neck, which, since she had been going out to
@@ -1801,8 +1874,8 @@ middle of the three gentlemen shouted like thunder and stamped his foot
 and thereby brought Gregor’s father to a halt. “I declare here and
 now”, he said, raising his hand and glancing at Gregor’s mother and
 sister to gain their attention too, “that with regard to the repugnant
-conditions that prevail in this flat and with this family”—here he
-looked briefly but decisively at the floor—“I give immediate notice on
+conditions that prevail in this flat and with this family” – here he
+looked briefly but decisively at the floor – “I give immediate notice on
 my room. For the days that I have been living here I will, of course,
 pay nothing at all, on the contrary I will consider whether to proceed
 with some kind of action for damages from you, and believe me it would
@@ -1935,10 +2008,10 @@ everywhere outside the window too. Then, without his willing it, his
 head sank down completely, and his last breath flowed weakly from his
 nostrils.
 
-When the cleaner came in early in the morning—they’d often asked her
+When the cleaner came in early in the morning – they’d often asked her
 not to keep slamming the doors but with her strength and in her hurry
 she still did, so that everyone in the flat knew when she’d arrived and
-from then on it was impossible to sleep in peace—she made her usual
+from then on it was impossible to sleep in peace – she made her usual
 brief look in on Gregor and at first found nothing special. She thought
 he was laying there so still on purpose, playing the martyr; she
 attributed all possible understanding to him. She happened to be
@@ -2069,7 +2142,7 @@ something they had not done for months, and took the tram out to the
 open country outside the town. They had the tram, filled with warm
 sunshine, all to themselves. Leant back comfortably on their seats,
 they discussed their prospects and found that on closer examination
-they were not at all bad—until then they had never asked each other
+they were not at all bad – until then they had never asked each other
 about their work but all three had jobs which were very good and held
 particularly good promise for the future. The greatest improvement for
 the time being, of course, would be achieved quite easily by moving
