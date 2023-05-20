@@ -35,27 +35,21 @@
 }
 
 % Use italics for emphasis
-\let\emph\it
+\def\emph{\it}
 
 % Start with normalsize roman
 \normalsize\rm
 
 %%% P A R A G R A P H   S E T T I N G S
 
-% Default distance between lines
-\baselineskip=15pt
 
-% No extra space after periods.
+\baselineskip=15pt
 \frenchspacing
 
-% Vertical distance between paragraphs
 \parskip=0pt
-
-% Paragraph indentation
 \parindent=1em
 
-% Allow some looseness if needed
-\emergencystretch=0pt
+\emergencystretch=4pt
 
 % \firstnoindent -- Don't indent next paragraph
 \def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
@@ -65,7 +59,7 @@
 \widowpenalty=0
 \clubpenalty=0
 
-\tolerance=9999
+\tolerance=2500
 
 \def\beginchapter#1#2{%
 	\centerline{\smash{\normalsize\rmspaced\uppercase{#1}}}
@@ -81,10 +75,11 @@
 	\vfil\break
 }
 
-\def\emph{}
-\def\sc{}
-
-\def\sectionbreak{*}
+\def\sectionbreak{%
+	\vskip\baselineskip	
+	\line{\hfill *\quad *\quad *\hfill}
+	\vskip\baselineskip
+}
 
 
 \def\beginblockquote{%
@@ -99,7 +94,7 @@
 	\egroup
 }
 
-% L A Y O U T
+%%% L A Y O U T
 
 \pagewidth=140mm
 \pageheight=210mm
@@ -111,12 +106,12 @@
 \voffset=\dimexpr(\pageheight/9)
 
 \hsize=93.333mm
-\vsize=140mm
+\vsize=\topskip \advance\vsize by 26\baselineskip
 
-%%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% F O O T E R 
 
 \def\makefootline{%
-	%\baselineskip=24pt
+	\baselineskip=24pt
 	\lineskiplimit=0pt
 	\line{%
 		\the\footline
@@ -130,7 +125,7 @@
 		\ifodd\pageno
 			\hss{\normalsize\rm \defaultcolor \folio}\hss% recto
 		\else
-			{\quad \normalsize\rm \defaultcolor \folio}\hss% verso	
+			\hss{\normalsize\rm \defaultcolor \folio}\hss% verso	
 		\fi
 	\else
 		\hss
@@ -141,7 +136,8 @@
 % Turn off footline on current page
 \def\thispagenofootline{\global\footlinefalse}
 
-%%%%%%%%%% C O L O R S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% C O L O R S 
 
 % Token for \aftergroup to reset color
 \def\colorstackpop{\pdfextension colorstack 0 pop}
@@ -174,21 +170,22 @@
 
 %%%%%%%%% C O N T E N T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The Call of Cthulhu
+% TODO: Titlepage
+\centerline{The Call of Cthulhu}
 \vfil\break
 
 \beginblockquote
-“Of such great powers or beings there may be conceivably a survival⁠ \dots\ a survival of a hugely remote period when⁠ \dots\ consciousness was manifested, perhaps, in shapes and forms long since withdrawn before the tide of advancing humanity⁠ \dots\ forms of which poetry and legend alone have caught a flying memory and called them gods, monsters, mythical beings of all sorts and kinds⁠\dots”\hfil\break
+\noindent \llap{“}Of such great powers or beings there may be conceivably a survival⁠ \dots\ a survival of a hugely remote period when⁠ \dots\ consciousness was manifested, perhaps, in shapes and forms long since withdrawn before the tide of advancing humanity⁠ \dots\ forms of which poetry and legend alone have caught a flying memory and called them gods, monsters, mythical beings of all sorts and kinds⁠\dots”\hfil\break
 \null\hfill Algernon Blackwood\par
 \endblockquote
 \vfil\break
 
 \beginchapter{I}{the horror in clay}
 
-\newdimen\indentdimen \indentdimen=6.7em
+% Lettrine
 \vskip4\baselineskip
 \noindent\leavevmode
-\smash{\rlap{\ebginitbg T}{\red\ebginitfg T}}
+\smash{\rlap{\red\ebginitbg T}{\ebginitfg T}}
 \vskip-5\baselineskip
 \dimen0=6.25em
 \dimen1=6.65em
