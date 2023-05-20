@@ -15,8 +15,11 @@
 \font\fourteenit "ETbb-Italic" at 13pt\relax
 \font\fourteensc "ETbb-Regular":+smcp,letterspace=8; at 13pt\relax
 
-\font\ebginitbg "EBGaramondInitialsF1" at 66pt
-\font\ebginitfg "EBGaramondInitialsF2" at 66pt
+\font\ebginitbg "EBGaramondInitialsF1" at 63pt
+\font\ebginitfg "EBGaramondInitialsF2" at 63pt
+
+\font\titlefontI "ETbb-Regular":letterspace=8; at 14pt
+\font\titlefontII "ETbb-Regular":letterspace=8; at 24pt
 
 %\font\ebgrm "EBGaramond-Regular" at 11pt
 
@@ -43,11 +46,15 @@
 %%% P A R A G R A P H   S E T T I N G S
 
 
-\baselineskip=15pt
+\baselineskip=14.226pt
 \frenchspacing
 
 \parskip=0pt
 \parindent=1em
+
+% \firstnoindent -- Don't indent next paragraph
+\def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
+\def\wipeeverypar{\global\everypar={}}
 
 \emergencystretch=4pt
 
@@ -62,6 +69,10 @@
 \tolerance=2500
 
 \def\beginchapter#1#2{%
+	\ifodd\pageno \else
+		\null\thispagenofootline
+		\vfil\break
+	\fi
 	\centerline{\smash{\normalsize\rmspaced\uppercase{#1}}}
 	\vskip\baselineskip
 	\centerline{\smash{\normalsize\rmspaced
@@ -77,21 +88,34 @@
 
 \def\sectionbreak{%
 	\vskip\baselineskip	
-	\line{\hfill *\quad *\quad *\hfill}
+	\line{%
+		\hfill
+		\smash{
+			\lower 1.1ex \hbox{*}%
+			\raise 0.1ex \hbox to 2pt{\hss *\hss}%
+			\lower 1.1ex \hbox{*}%
+		}%
+		\hfill
+	}%
 	\vskip\baselineskip
+	\firstnoindent
 }
 
 
 \def\beginblockquote{%
+	\vskip\baselineskip
 	\bgroup
 	\advance\leftskip by 2em
 	\rightskip=\leftskip	
 }
 
 \def\endblockquote{%
+	\par
 	\advance\leftskip by -2em
 	\rightskip=\leftskip
 	\egroup
+	\vskip\baselineskip
+	\firstnoindent
 }
 
 %%% L A Y O U T
@@ -106,7 +130,27 @@
 \voffset=\dimexpr(\pageheight/9)
 
 \hsize=93.333mm
-\vsize=\topskip \advance\vsize by 26\baselineskip
+\vsize=\topskip \advance\vsize by 27\baselineskip
+
+% Backup original vsize 
+\newdimen\originalvsize \originalvsize=\vsize
+
+% Defines a macro \ap:<pageno>, expands to how many lines should be adjusted.
+\def\adjustpage#1#2{%
+	\expandafter\xdef\csname ap:#1\endcsname{#2}
+	\ifnum #1=1
+		\setvsize
+	\fi
+}
+% Example: \adjustpage{15}{+2} adjusts page 15 to have 2 extra lines
+
+% This macro gets expanded last in the output routine, don't use directly.
+\def\setvsize{%
+	\global\vsize=\originalvsize
+	\ifcsname ap:\the\pageno\endcsname
+		\global\advance \vsize by \csname ap:\the\pageno\endcsname \baselineskip
+	\fi
+}
 
 %%% F O O T E R 
 
@@ -168,15 +212,55 @@
 % Example: {\hyperlinkcolor This is blue text}
 
 
+%%% O U T P U T   R O U T I N E
+
+\output{\beforeoutput \plainoutput \afteroutput}
+
+% For two page layout, \shiftoffset is how much verso pages should move
+\newdimen\shiftoffset
+\shiftoffset = \pagewidth
+\advance \shiftoffset by -\hsize
+\advance \shiftoffset by -2\hoffset
+
+\def\beforeoutput{%
+	% Two page layout
+	\ifodd\pageno
+	\else
+		\advance \hoffset by \shiftoffset
+	\fi
+}
+
+\def\afteroutput{%
+	% Manually overriding vsize to solve widows through \adjustpage
+	\setvsize
+}
+
+
 %%%%%%%%% C O N T E N T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO: Titlepage
-\centerline{The Call of Cthulhu}
-\vfil\break
+% Titlepage
+\thispagenofootline
+\vglue2\baselineskip
+\centerline{\titlefontI THE CALL OF}
+\vskip\baselineskip
+\centerline{\titlefontII CTHULHU}
+\vskip\baselineskip
+\sectionbreak
+\vskip\baselineskip
+\centerline{\rmspaced H. P. LOVECRAFT}
+\vfill
+\centerline{Privately printed}
+\centerline{Staffanstorp, 2023}
 
+\vfil\break
+\null\thispagenofootline\vfil\break
+
+\vglue2\baselineskip
 \beginblockquote
+{\it
 \noindent \llap{“}Of such great powers or beings there may be conceivably a survival⁠ \dots\ a survival of a hugely remote period when⁠ \dots\ consciousness was manifested, perhaps, in shapes and forms long since withdrawn before the tide of advancing humanity⁠ \dots\ forms of which poetry and legend alone have caught a flying memory and called them gods, monsters, mythical beings of all sorts and kinds⁠\dots”\hfil\break
-\null\hfill Algernon Blackwood\par
+\null\hfill Algernon Blackwood%
+}
 \endblockquote
 \vfil\break
 
@@ -185,10 +269,10 @@
 % Lettrine
 \vskip4\baselineskip
 \noindent\leavevmode
-\smash{\rlap{\red\ebginitbg T}{\ebginitfg T}}
+\smash{\rlap{\ebginitbg T}{\red\ebginitfg T}}
 \vskip-5\baselineskip
-\dimen0=6.25em
-\dimen1=6.65em
+\dimen0=5.95em
+\dimen1=6.35em
 \parshape 6
 	\dimen0 \dimexpr(\hsize-\dimen0)
 	\dimen1 \dimexpr(\hsize-\dimen1)
@@ -197,6 +281,7 @@
 	\dimen1 \dimexpr(\hsize-\dimen1)
 	0em \hsize
 \noindent
+%T%
 {\sc he most merciful thing} in the world, I think, is the inability of the human mind to correlate all its contents. We live on a placid island of ignorance in the midst of black seas of infinity, and it was not meant that we should voyage far. The sciences, each straining in its own direction, have hitherto harmed us little; but some day the piecing together of dissociated knowledge will open up such terrifying vistas of reality, and of our frightful position therein, that we shall either go mad from the revelation or flee from the deadly light into the peace and safety of a new dark age.
 
 Theosophists have guessed at the awesome grandeur of the cosmic cycle wherein our world and human race form transient incidents. They have hinted at strange survivals in terms which would freeze the blood if not masked by a bland optimism. But it is not from them that there came the single glimpse of forbidden eons which chills me when I think of it and maddens me when I dream of it. That glimpse, like all dread glimpses of truth, flashed out from an accidental piecing together of separated things⁠ – in this case an old newspaper item and the notes of a dead professor. I hope that no one else will accomplish this piecing out; certainly, if I live, I shall never knowingly supply a link in so hideous a chain. I think that the professor, too, intended to keep silent regarding the part he knew, and that he would have destroyed his notes had not sudden death seized him.
@@ -236,7 +321,23 @@ The press cuttings, as I have intimated, touched on cases of panic, mania, and e
 
 \beginchapter{II}{The Tale of Inspector Legrasse}
 
-The older matters which had made the sculptor’s dream and bas-relief so significant to my uncle formed the subject of the second half of his long manuscript. Once before, it appears, Professor Angell had seen the hellish outlines of the nameless monstrosity, puzzled over the unknown hieroglyphics, and heard the ominous syllables which can be rendered only as “{\emph Cthulhu}”; and all this in so stirring and horrible a connection that it is small wonder he pursued young Wilcox with queries and demands for data.
+% Lettrine
+\vskip4\baselineskip
+\noindent\leavevmode
+\smash{\rlap{\ebginitbg T}{\red\ebginitfg T}}
+\vskip-5\baselineskip
+\dimen0=5.95em
+\dimen1=6.35em
+\parshape 6
+	\dimen0 \dimexpr(\hsize-\dimen0)
+	\dimen1 \dimexpr(\hsize-\dimen1)
+	\dimen1 \dimexpr(\hsize-\dimen1)
+	\dimen1 \dimexpr(\hsize-\dimen1)
+	\dimen1 \dimexpr(\hsize-\dimen1)
+	0em \hsize
+\noindent
+%T%
+{\sc he older matters} which had made the sculptor’s dream and bas-relief so significant to my uncle formed the subject of the second half of his long manuscript. Once before, it appears, Professor Angell had seen the hellish outlines of the nameless monstrosity, puzzled over the unknown hieroglyphics, and heard the ominous syllables which can be rendered only as “{\emph Cthulhu}”; and all this in so stirring and horrible a connection that it is small wonder he pursued young Wilcox with queries and demands for data.
 
 This earlier experience had come in 1908, seventeen years before, when the American Archeological Society held its annual meeting in St. Louis. Professor Angell, as befitted one of his authority and attainments, had had a prominent part in all the deliberations; and was one of the first to be approached by the several outsiders who took advantage of the convocation to offer questions for correct answering and problems for expert solution.
 
@@ -257,15 +358,16 @@ Professor Webb had been engaged, forty-eight years before, in a tour of Greenlan
 These data, received with suspense and astonishment by the assembled members, proved doubly exciting to Inspector Legrasse; and he began at once to ply his informant with questions. Having noted and copied an oral ritual among the swamp cult-worshipers his men had arrested, he besought the professor to remember as best he might the syllables taken down amongst the diabolist Eskimos. There then followed an exhaustive comparison of details, and a moment of really awed silence when both detective and scientist agreed on the virtual identity of the phrase common to two hellish rituals so many worlds of distance apart. What, in substance, both the Eskimo wizards and the Louisiana swamp-priests had chanted to their kindred idols was something very like this⁠ – the word-divisions being guessed at from traditional breaks in the phrase as chanted aloud:
 
 \beginblockquote
-“{\emph Ph’nglui mglw’nafh Cthulhu R’lyeh wgah’nagl fhtagn.}”
+\noindent{\emph Ph’nglui mglw’nafh Cthulhu R’lyeh wgah’nagl fhtagn.}
 \endblockquote
 
 Legrasse had one point in advance of Professor Webb, for several among his mongrel prisoners had repeated to him what older celebrants had told them the words meant. This text, as given, ran something like this:
 
 \beginblockquote
-“In his house at R’lyeh dead Cthulhu waits dreaming.”
+\noindent In his house at R’lyeh dead Cthulhu waits dreaming.
 \endblockquote
 
+\vskip-\baselineskip
 \sectionbreak
 
 And now, in response to a general urgent demand, Inspector Legrasse related as fully as possible his experience with the swamp worshipers; telling a story to which I could see my uncle attached profound significance. It savored of the wildest dreams of myth-maker and theosophist, and disclosed an astonishing degree of cosmic imagination among such half-castes and pariahs as might be least expected to possess it.
@@ -279,7 +381,7 @@ The region now entered by the police was one of traditionally evil repute, subst
 Only poetry or madness could do justice to the noises heard by Legrasse’s men as they plowed on through the black morass toward the red glare and the muffled tom-toms. There are vocal qualities peculiar to men, and vocal qualities peculiar to beasts; and it is terrible to hear the one when the source should yield the other. Animal fury and orgiastic license here whipped themselves to demoniac heights by howls and squawking ecstasies that tore and reverberated through those nighted woods like pestilential tempests from the gulfs of hell. Now and then the less organized ululations would cease, and from what seemed a well-drilled chorus of hoarse voices would rise in singsong chant that hideous phrase or ritual:
 
 \beginblockquote
-“{\emph Ph’nglui mglw’nafh Cthulhu R’lyeh wgah’nagl fhtagn.}”
+\noindent{\emph Ph’nglui mglw’nafh Cthulhu R’lyeh wgah’nagl fhtagn.}
 \endblockquote
 
 Then the men, having reached a spot where the trees were thinner, came suddenly in sight of the spectacle itself. Four of them reeled, one fainted, and two were shaken into a frantic cry which the mad cacophony of the orgy fortunately deadened. Legrasse dashed swamp water on the face of the fainting man, and all stood trembling and nearly hypnotized with horror.
@@ -309,8 +411,10 @@ Then, whispered Castro, those first men formed the cult around small idols which
 In the elder time chosen men had talked with the entombed Old Ones in dreams, but then something had happened. The great stone city R’lyeh, with its monoliths and sepulchers, had sunk beneath the waves; and the deep waters, full of the one primal mystery through which not even thought can pass, had cut off the spectral intercourse. But memory never died, and high priests said that the city would rise again when the stars were right. Then came out of the earth the black spirits of earth, moldy and shadowy, and full of dim rumors picked up in caverns beneath forgotten sea-bottoms. But of them old Castro dared not speak much. He cut himself off hurriedly, and no amount of persuasion or subtlety could elicit more in this direction. The {\emph size} of the Old Ones, too, he curiously declined to mention. Of the cult, he said that he thought the center lay amid the pathless deserts of Arabia, where Irem, the City of Pillars, dreams hidden and untouched. It was not allied to the European witch-cult, and was virtually unknown beyond its members. No book had ever really hinted of it, though the deathless Chinamen said that there were double meanings in the {\emph Necronomicon} of the mad Arab Abdul Alhazred which the initiated might read as they chose, especially the much-discussed couplet:
 
 \beginblockquote
-{“That is not dead which can eternal lie,}\break
-{And with strange eons even death may die.”}
+{
+\noindent That is not dead which can eternal lie,\hfil\break
+And with strange eons even death may die.
+}
 \endblockquote
 
 Legrasse, deeply impressed and not a little bewildered, had inquired in vain concerning the historic affiliations of the cult. Castro, apparently, had told the truth when he said that it was wholly secret. The authorities at Tulane University could shed no light upon either cult or image, and now the detective had come to the highest authorities in the country and met with no more than the Greenland tale of Professor Webb.
@@ -338,20 +442,38 @@ One thing which I began to suspect, and which I now fear I {\emph know}, is that
 
 \beginchapter{III}{The Madness from the Sea}
 
-If heaven ever wishes to grant me a boon, it will be a total effacing of the results of a mere chance which fixed my eye on a certain stray piece of shelf-paper. It was nothing on which I would naturally have stumbled in the course of my daily round, for it was an old number of an Australian journal, {\emph Sydney Bulletin} for April 18, 1925. It had escaped even the cutting bureau which had at the time of its issuance been avidly collecting material for my uncle’s research.
+% Lettrine
+\vskip4\baselineskip
+\noindent\leavevmode
+\smash{\rlap{\ebginitbg I}{\red\ebginitfg I}}
+\vskip-5\baselineskip
+\dimen0=5.95em
+\dimen1=6.35em
+\parshape 6
+	\dimen0 \dimexpr(\hsize-\dimen0)
+	\dimen1 \dimexpr(\hsize-\dimen1)
+	\dimen1 \dimexpr(\hsize-\dimen1)
+	\dimen1 \dimexpr(\hsize-\dimen1)
+	\dimen1 \dimexpr(\hsize-\dimen1)
+	0em \hsize
+\noindent
+%I%
+{\sc f heaven ever} wishes to grant me a boon, it will be a total effacing of the results of a mere chance which fixed my eye on a certain stray piece of shelf-paper. It was nothing on which I would naturally have stumbled in the course of my daily round, for it was an old number of an Australian journal, {\emph Sydney Bulletin} for April 18, 1925. It had escaped even the cutting bureau which had at the time of its issuance been avidly collecting material for my uncle’s research.
 
 I had largely given over my inquiries into what Professor Angell called the “Cthulhu Cult,” and was visiting a learned friend of Paterson, New Jersey; the curator of a local museum and a mineralogist of note. Examining one day the reserve specimens roughly set on the storage shelves in a rear room of the museum, my eye was caught by an odd picture in one of the old papers spread beneath the stones. It was the {\emph Sydney Bulletin} I have mentioned, for my friend has wide affiliations in all conceivable foreign parts; and the picture was a halftone cut of a hideous stone image almost identical with that which Legrasse had found in the swamp.
 
 Eagerly clearing the sheet of its precious contents, I scanned the item in detail; and was disappointed to find it of only moderate length. What it suggested, however, was of portentous significance to my flagging quest; and I carefully tore it out for immediate action. It read as follows:
 
 \beginblockquote
-Mystery Derelict Found at Sea
+\centerline{\sc Mystery Derelict Found at Sea}
 
-{\emph Vigilant} Arrives With Helpless Armed New Zealand Yacht in Tow. One Survivor and Dead Man Found Aboard. Tale of Desperate Battle and Deaths at Sea. Rescued Seaman Refuses Particulars of Strange Experience. Odd Idol Found in His Possession. Inquiry to Follow.
+\vskip\baselineskip
 
-\sectionbreak
+\noindent{\emph Vigilant} Arrives With Helpless Armed New Zealand Yacht in Tow. One Survivor and Dead Man Found Aboard. Tale of Desperate Battle and Deaths at Sea. Rescued Seaman Refuses Particulars of Strange Experience. Odd Idol Found in His Possession. Inquiry to Follow.
 
-The Morrison Co.’s freighter {\emph Vigilant}, bound from Valparaiso, arrived this morning at its wharf in Darling Harbour, having in tow the battled and disabled but heavily armed steam yacht {\emph Alert} of Dunedin, N.Z., which was sighted April 12th in S. Latitude 34° 21', W. Longitude 152° 17', with one living and one dead man aboard.
+\centerline{\vrule height 2.7pt depth -2.4pt width 5em}
+
+\noindent The Morrison Co.’s freighter {\emph Vigilant}, bound from Valparaiso, arrived this morning at its wharf in Darling Harbour, having in tow the battled and disabled but heavily armed steam yacht {\emph Alert} of Dunedin, N.Z., which was sighted April 12th in S. Latitude 34° 21', W. Longitude 152° 17', with one living and one dead man aboard.
 
 The {\emph Vigilant} left Valparaiso March 25th, and on April 2nd was driven considerably south of her course by exceptionally heavy storms and monster waves. On April 12th the derelict was sighted; and though apparently deserted, was found upon boarding to contain one survivor in a half-delirious condition and one man who had evidently been dead for more than a week.
 
