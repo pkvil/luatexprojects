@@ -54,8 +54,12 @@
 % Paragraph indentation
 \parindent=1em
 
-% Allow some looseness if needed
-\emergencystretch=8pt
+% Badness
+\emergencystretch=0pt
+\pretolerance=150
+\tolerance=250
+\hbadness=150
+\hfuzz=0pt
 
 % \firstnoindent -- Don't indent next paragraph
 \def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}

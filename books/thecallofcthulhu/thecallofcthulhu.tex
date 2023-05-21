@@ -56,8 +56,6 @@
 \def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
 \def\wipeeverypar{\global\everypar={}}
 
-\emergencystretch=4pt
-
 % \firstnoindent -- Don't indent next paragraph
 \def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
 \def\wipeeverypar{\global\everypar={}}
@@ -66,7 +64,12 @@
 \widowpenalty=0
 \clubpenalty=0
 
-\tolerance=2500
+% Badness
+\emergencystretch=0pt
+\pretolerance=150
+\tolerance=1436
+\hbadness=1436
+\hfuzz=0.4pt
 
 \def\beginchapter#1#2{%
 	\ifodd\pageno \else
@@ -237,6 +240,11 @@
 	\setvsize
 }
 
+%%% W I D O W   C O N T R O L
+\adjustpage{10}{+1} \adjustpage{11}{+1}
+\adjustpage{36}{+1} \adjustpage{37}{+1}
+\adjustpage{40}{+1} \adjustpage{41}{+1}
+
 
 %%%%%%%%% C O N T E N T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -245,7 +253,7 @@
 \vglue2\baselineskip
 \centerline{\titlefontI THE CALL OF}
 \vskip\baselineskip
-\centerline{\titlefontII CTHULHU}
+\centerline{\titlefontII\red CTHULHU}
 \vskip\baselineskip
 \sectionbreak
 \vskip\baselineskip
@@ -257,13 +265,12 @@
 \vfil\break
 \null\thispagenofootline\vfil\break
 
-\vglue2\baselineskip
-\beginblockquote
+\vglue3\baselineskip
 {\it
-\noindent \llap{“}Of such great powers or beings there may be conceivably a survival⁠ \dots\ a survival of a hugely remote period when⁠ \dots\ consciousness was manifested, perhaps, in shapes and forms long since withdrawn before the tide of advancing humanity⁠ \dots\ forms of which poetry and legend alone have caught a flying memory and called them gods, monsters, mythical beings of all sorts and kinds⁠\dots”\hfil\break
-\null\hfill Algernon Blackwood%
+\noindent \llap{“}Of such great powers or beings there may be conceivably a survival⁠ \dots\ a survival of a hugely remote period when⁠ \dots\ consciousness was manifested, perhaps, in shapes and forms long since withdrawn before the tide of advancing humanity⁠ \dots\ forms of which poetry and legend alone have caught a flying memory and called them gods, monsters, mythical beings of all sorts and kinds⁠\dots”
+
+\null\hfill Algernon Blackwood\par%
 }
-\endblockquote
 \vfil\break
 
 \beginchapter{I}{the horror in clay}
@@ -296,13 +303,13 @@ The bas-relief was a rough rectangle less than an inch thick and about five by s
 
 Above these apparent hieroglyphics was a figure of evidently pictorial intent, though its impressionistic execution forbade a very clear idea of its nature. It seemed to be a sort of monster, or symbol representing a monster, of a form which only a diseased fancy could conceive. If I say that my somewhat extravagant imagination yielded simultaneous pictures of an octopus, a dragon, and a human caricature, I shall not be unfaithful to the spirit of the thing. A pulpy, tentacled head surmounted a grotesque and scaly body with rudimentary wings; but it was the {\emph general outline} of the whole which made it most shockingly frightful. Behind the figure was a vague suggestion of a Cyclopean architectural background.
 
-The writing accompanying this oddity was, aside from a stack of press cuttings, in Professor Angell’s most recent hand; and made no pretense to literary style. What seemed to be the main document was headed “{\sc Cthulhu Cult}” in characters painstakingly printed to avoid the erroneous reading of a word so unheard-of. This manuscript was divided into two sections, the first of which was headed “1925⁠ – Dream and Dream Work of H. A. Wilcox, 7 Thomas St., Providence, RI,” and the second, “Narrative of Inspector John R. Legrasse, 121 Bienville St., New Orleans, LA, at 1908 A.A.S. Mtg.⁠ – Notes on Same, \& Prof. Webb’s Acct.” The other manuscript papers were all brief notes, some of them accounts of the queer dreams of different persons, some of them citations from theosophical books and magazines (notably W. Scott-Eliott’s {\emph Atlantis and the Lost Lemuria}), and the rest comments on long-surviving secret societies and hidden cults, with references to passages in such mythological and anthropological source-books as Frazer’s {\emph Golden Bough} and Miss Murray’s {\emph Witch-Cult in Western Europe}. The cuttings largely alluded to outré mental illnesses and outbreaks of group folly or mania in the spring of 1925.
+The writing accompanying this oddity was, aside from a stack of press cuttings, in Professor Angell’s most recent hand; and made no pretense to literary style. What seemed to be the main document was headed “{\emph Cthulhu Cult}” in characters painstakingly printed to avoid the erroneous reading of a word so unheard-of. This manuscript was divided into two sections, the first of which was headed “1925⁠ – Dream and Dream Work of H. A. Wilcox, 7 Thomas St., Providence, RI,” and the second, “Narrative of Inspector John R. Legrasse, 121 Bienville St., New Orleans, LA, at 1908 A.A.S. Mtg.⁠ – Notes on Same, \& Prof. Webb’s Acct.” The other manuscript papers were all brief notes, some of them accounts of the queer dreams of different persons, some of them citations from theosophical books and magazines (notably W. Scott-Eliott’s {\emph Atlantis and the Lost Lemuria}), and the rest comments on long-surviving secret societies and hidden cults, with references to passages in such mythological and anthropological source-books as Frazer’s {\emph Golden Bough} and Miss Murray’s {\emph Witch-Cult in Western Europe}. The cuttings largely alluded to outré mental illnesses and outbreaks of group folly or mania in the spring of 1925.
 
 \sectionbreak
 
 The first half of the principal manuscript told a very peculiar tale. It appears that on March 1st, 1925, a thin, dark young man of neurotic and excited aspect had called upon Professor Angell bearing the singular clay bas-relief, which was then exceedingly damp and fresh. His card bore the name of Henry Anthony Wilcox, and my uncle had recognized him as the youngest son of an excellent family slightly known to him, who had latterly been studying sculpture at the Rhode Island School of Design and living alone at the Fleur-de-Lys Building near that institution. Wilcox was a precocious youth of known genius but great eccentricity, and had from childhood excited attention through the strange stories and odd dreams he was in the habit of relating. He called himself “psychically hypersensitive,” but the staid folk of the ancient commercial city dismissed him as merely “queer.” Never mingling much with his kind, he had dropped gradually from social visibility, and was now known only to a small group of esthetes from other towns. Even the Providence Art Club, anxious to preserve its conservatism, had found him quite hopeless.
 
-On the occasion of the visit, ran the professor’s manuscript, the sculptor abruptly asked for the benefit of his host’s archeological knowledge in identifying the hieroglyphics on the bas-relief. He spoke in a dreamy, stilted manner which suggested pose and alienated sympathy; and my uncle showed some sharpness in replying, for the conspicuous freshness of the tablet implied kinship with anything but archeology. Young Wilcox’s rejoinder, which impressed my uncle enough to make him recall and record it verbatim, was of a fantastically poetic cast which must have typified his whole conversation, and which I have since found highly characteristic of him. He said, “It is new, indeed, for I made it last night in a dream of strange cities; and dreams are older than brooding Tyre, or the contemplative Sphinx, or garden-girdled Babylon.”
+On the occasion of the visit, ran the professor’s manu\-script, the sculptor abruptly asked for the benefit of his host’s archeological knowledge in identifying the hieroglyphics on the bas-relief. He spoke in a dreamy, stilted manner which suggested pose and alienated sympathy; and my uncle showed some sharpness in replying, for the conspicuous freshness of the tablet implied kinship with anything but archeology. Young Wilcox’s rejoinder, which impressed my uncle enough to make him recall and record it verbatim, was of a fantastically poetic cast which must have typified his whole conversation, and which I have since found highly characteristic of him. He said, “It is new, indeed, for I made it last night in a dream of strange cities; and dreams are older than brooding Tyre, or the contemplative Sphinx, or garden-girdled Babylon.”
 
 It was then that he began that rambling tale which suddenly played upon a sleeping memory and won the fevered interest of my uncle. There had been a slight earthquake tremor the night before, the most considerable felt in New England for some years; and Wilcox’s imagination had been keenly affected. Upon retiring, he had had an unprecedented dream of great Cyclopean cities of Titan blocks and sky-flung monoliths, all dripping with green ooze and sinister with latent horror. Hieroglyphics had covered the walls and pillars, and from some undetermined point below had come a voice that was not a voice; a chaotic sensation which only fancy could transmute into sound, but which he attempted to render by the almost unpronounceable jumble of letters, “{\emph Cthulhu fhtagn.}”
 
@@ -318,6 +325,7 @@ Here the first part of the manuscript ended, but references to certain of the sc
 
 It was from the artists and poets that the pertinent answers came, and I know that panic would have broken loose had they been able to compare notes. As it was, lacking their original letters, I half suspected the compiler of having asked leading questions, or of having edited the correspondence in corroboration of what he had latently resolved to see. That is why I continued to feel that Wilcox, somehow cognizant of the old data which my uncle had possessed, had been imposing on the veteran scientist. These responses from esthetes told a disturbing tale. From February 28th to April 2nd a large proportion of them had dreamed very bizarre things, the intensity of the dreams being immeasurably the stronger during the period of the sculptor’s delirium. Over a fourth of those who reported anything, reported scenes and half-sounds not unlike those which Wilcox had described; and some of the dreamers confessed acute fear of the gigantic nameless thing visible toward the last. One case, which the note describes with emphasis, was very sad. The subject, a widely known architect with leanings toward theosophy and occultism, went violently insane on the date of young Wilcox’s seizure, and expired several months later after incessant screamings to be saved from some escaped denizen of hell. Had my uncle referred to these cases by name instead of merely by number, I should have attempted some corroboration and personal investigation; but as it was, I succeeded in tracing down only a few. All of these, however, bore out the notes in full. I have often wondered if all the objects of the professor’s questioning felt as puzzled as did this fraction. It is well that no explanation shall ever reach them.
 
+\looseness-1
 The press cuttings, as I have intimated, touched on cases of panic, mania, and eccentricity during the given period. Professor Angell must have employed a cutting bureau, for the number of extracts was tremendous, and the sources scattered throughout the globe. Here was a nocturnal suicide in London, where a lone sleeper had leaped from a window after a shocking cry. Here likewise a rambling letter to the editor of a paper in South America, where a fanatic deduces a dire future from visions he has seen. A dispatch from California describes a theosophist colony as donning white robes en masse for some “glorious fulfilment” which never arrives, whilst items from India speak guardedly of serious native unrest toward the end of March. Voodoo orgies multiply in Haiti, and African outposts report ominous mutterings. American officers in the Philippines find certain tribes bothersome about this time, and New York policemen are mobbed by hysterical Levantines on the night of March 22⁠–⁠23. The west of Ireland, too, is full of wild rumor and legendry, and a fantastic painter named Ardois-Bonnot hangs a blasphemous {\emph Dream Landscape} in the Paris spring salon of 1926. And so numerous are the recorded troubles in insane asylums that only a miracle can have stopped the medical fraternity from noting strange parallelisms and drawing mystified conclusions. A weird bunch of cuttings, all told; and I can at this date scarcely envisage the callous rationalism with which I set them aside. But I was then convinced that young Wilcox had known of the older matters mentioned by the professor.
 \endchapter
 
@@ -425,6 +433,7 @@ Legrasse, deeply impressed and not a little bewildered, had inquired in vain con
 
 The feverish interest aroused at the meeting by Legrasse’s tale, corroborated as it was by the statuette, is echoed in the subsequent correspondence of those who attended; although scant mention occurs in the formal publication of the society. Caution is the first care of those accustomed to face occasional charlatanry and imposture. Legrasse for some time lent the image to Professor Webb, but at the latter’s death it was returned to him and remains in his possession, where I viewed it not long ago. It is truly a terrible thing, and unmistakably akin to the dream-sculpture of young Wilcox.
 
+\looseness-1
 That my uncle was excited by the tale of the sculptor I did not wonder, for what thoughts must arise upon hearing, after a knowledge of what Legrasse had learned of the cult, of a sensitive young man who had {\emph dreamed} not only the figure and exact hieroglyphics of the swamp-found image and the Greenland devil tablet, but had come {\emph in his dreams} upon at least three of the precise words of the formula uttered alike by Eskimo diabolists and mongrel Louisianans? Professor Angell’s instant start on an investigation of the utmost thoroughness was eminently natural; though privately I suspected young Wilcox of having heard of the cult in some indirect way, and of having invented a series of dreams to heighten and continue the mystery at my uncle’s expense. The dream-narratives and cuttings collected by the professor were, of course, strong corroboration; but the rationalism of my mind and the extravagance of the whole subject led me to adopt what I thought the most sensible conclusions. So, after thoroughly studying the manuscript again and correlating the theosophical and anthropological notes with the cult narrative of Legrasse, I made a trip to Providence to see the sculptor and give him the rebuke I thought proper for so boldly imposing upon a learned and aged man.
 
 Wilcox still lived alone in the Fleur-de-Lys Building in Thomas Street, a hideous Victorian imitation of Seventeenth Century Breton architecture which flaunts its stuccoed front amidst the lovely Colonial houses on the ancient hill, and under the very shadow of the finest Georgian steeple in America. I found him at work in his rooms, and at once conceded from the specimens scattered about that his genius is indeed profound and authentic. He will, I believe, be heard from sometime as one of the great decadents; for he has crystallized in clay and will one day mirror in marble those nightmares and fantasies which Arthur Machen evokes in prose, and Clark Ashton Smith makes visible in verse and in painting.
@@ -471,13 +480,13 @@ Eagerly clearing the sheet of its precious contents, I scanned the item in detai
 
 \vskip\baselineskip
 
-\noindent{\emph Vigilant} Arrives With Helpless Armed New Zealand Yacht in Tow. One Survivor and Dead Man Found Aboard. Tale of Desperate Battle and Deaths at Sea. Rescued Seaman Refuses Particulars of Strange Experience. Odd Idol Found in His Possession. Inquiry to Follow.
+\noindent{\emph Vigilant} Arrives With Helpless Armed New Zea\-land Yacht in Tow. One Survivor and Dead Man Found Aboard. Tale of Desperate Battle and Deaths at Sea. Rescued Seaman Refuses Particulars of Strange Experience. Odd Idol Found in His Possession. Inquiry to Follow.
 
 \centerline{\vrule height 2.7pt depth -2.4pt width 5em}
 
 \noindent The Morrison Co.’s freighter {\emph Vigilant}, bound from Valparaiso, arrived this morning at its wharf in Darling Harbour, having in tow the battled and disabled but heavily armed steam yacht {\emph Alert} of Dunedin, N.Z., which was sighted April 12th in S. Latitude 34° 21', W. Longitude 152° 17', with one living and one dead man aboard.
 
-The {\emph Vigilant} left Valparaiso March 25th, and on April 2nd was driven considerably south of her course by exceptionally heavy storms and monster waves. On April 12th the derelict was sighted; and though apparently deserted, was found upon boarding to contain one survivor in a half-delirious condition and one man who had evidently been dead for more than a week.
+The {\emph Vigilant} left Valparaiso March 25th, and on April 2nd was driven considerably south of her course by exceptionally heavy storms and monster waves. On April 12th the derelict was sighted; and though apparently deserted, was found upon boarding to contain one survivor in a half-deliri\-ous condition and one man who had evidently been dead for more than a week.
 
 The living man was clutching a horrible stone idol of unknown origin, about a foot in height, regarding whose nature authorities at Sydney University, the Royal Society, and the Museum in College Street all profess complete bafflement, and which the survivor says he found in the cabin of the yacht, in a small carved shrine of common pattern.
 
@@ -512,6 +521,7 @@ That evening, after a day of hurried cabling and arranging, I bade my host adieu
 
 In Auckland I learned that Johansen had returned {\emph with yellow hair turned white} after a perfunctory and inconclusive questioning at Sydney, and had thereafter sold his cottage in West Street and sailed with his wife to his old home in Oslo. Of his stirring experience he would tell his friends no more than he had told the admiralty officials, and all they could do was to give me his Oslo address.
 
+\looseness+1
 After that I went to Sydney and talked profitlessly with seamen and members of the vice-admiralty court. I saw the {\emph Alert}, now sold and in commercial use, at Circular Quay in Sydney Cove, but gained nothing from its noncommittal bulk. The crouching image with its cuttlefish head, dragon body, scaly wings, and hieroglyphed pedestal, was preserved in the Museum at Hyde Park; and I studied it long and well, finding it a thing of balefully exquisite workmanship, and with the same utter mystery, terrible antiquity, and unearthly strangeness of material which I had noted in Legrasse’s smaller specimen. Geologists, the curator told me, had found it a monstrous puzzle; for they vowed that the world held no rock like it. Then I thought with a shudder of what old Castro had told Legrasse about the primal Great Ones: “They had come from the stars, and had brought Their images with Them.”
 
 Shaken with such a mental revolution as I had never before known, I now resolved to visit Mate Johansen in Oslo. Sailing for London, I re-embarked at once for the Norwegian capital; and one autumn day landed at the trim wharves in the shadow of the Egeberg.
@@ -532,7 +542,7 @@ Johansen’s voyage had begun just as he told it to the vice-admiralty. The {\em
 
 I suppose that only a single mountain-top, the hideous monolith-crowned citadel whereon great Cthulhu was buried, actually emerged from the waters. When I think of the {\emph extent} of all that may be brooding down there I almost wish to kill myself forthwith. Johansen and his men were awed by the cosmic majesty of this dripping Babylon of elder demons, and must have guessed without guidance that it was nothing of this or of any sane planet. Awe at the unbelievable size of the greenish stone blocks, at the dizzying height of the great carven monolith, and at the stupefying identity of the colossal statues and bas-reliefs with the queer image found in the shrine on the {\emph Alert}, is poignantly visible in every line of the mate’s frightened description.
 
-Without knowing what futurism is like, Johansen achieved something very close to it when he spoke of the city; for instead of describing any definite structure or building, he dwells only on the broad impressions of vast angles and stone surfaces⁠ – surfaces too great to belong to anything right or proper for this earth, and impious with horrible images and hieroglyphs. I mention his talk about {\emph angles} because it suggests something Wilcox had told me of his awful dreams. He had said that the {\emph geometry} of the dream-place he saw was abnormal, non-Euclidean, and loathsomely redolent of spheres and dimensions apart from ours. Now an unlettered seaman felt the same thing whilst gazing at the terrible reality.
+Without knowing what futurism is like, Johansen achie\-ved something very close to it when he spoke of the city; for instead of describing any definite structure or building, he dwells only on the broad impressions of vast angles and stone surfaces⁠ – surfaces too great to belong to anything right or proper for this earth, and impious with horrible images and hieroglyphs. I mention his talk about {\emph angles} because it suggests something Wilcox had told me of his awful dreams. He had said that the {\emph geometry} of the dream-place he saw was abnormal, non-Euclidean, and loathsomely redolent of spheres and dimensions apart from ours. Now an unlettered seaman felt the same thing whilst gazing at the terrible reality.
 
 Johansen and his men landed at a sloping mud-bank on this monstrous Acropolis, and clambered slipperily up over titan oozy blocks which could have been no mortal staircase. The very sun of heaven seemed distorted when viewed through the polarizing miasma welling out from this sea-soaked perversion, and twisted menace and suspense lurked leeringly in those crazily elusive angles of carven rock where a second glance showed concavity after the first showed convexity.
 
