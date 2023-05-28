@@ -12,13 +12,13 @@
 \input luaotfload.sty
 
 % Font names
-\font\tenrm "EBGaramond-Regular":+onum; at 10pt\relax
-\font\tenit "EBGaramond-Italic" at 10pt\relax
-\font\tensc "EBGaramond-Regular":+pcap,letterspace=6; at 10pt\relax
+\font\tenrm "EBGaramond-Regular":+onum; at 10pt
+\font\tenit "EBGaramond-Italic" at 10pt
+\font\tensc "EBGaramond-Regular":+pcap,letterspace=6; at 10pt
 
-\font\twelverm "EBGaramond-Regular":+onum; at 12pt\relax
-\font\twelveit "EBGaramond-Italic" at 12pt\relax
-\font\twelvesc "EBGaramond-Regular":+smcp,letterspace=6; at 12pt\relax
+\font\twelverm "EBGaramond-Regular":+onum; at 12pt
+\font\twelveit "EBGaramond-Italic" at 12pt
+\font\twelvesc "EBGaramond-Regular":+smcp,letterspace=6; at 12pt
 
 % Semantic names for direct use
 \def\normalsize{%
@@ -89,7 +89,6 @@
 % Typeset area size
 \hsize=98.666mm	
 \vsize=\topskip \advance\vsize by 29\baselineskip
-
 
 % Backup original vsize 
 \newdimen\originalvsize \originalvsize=\vsize
@@ -267,7 +266,8 @@
 	% Start on a recto page
 	\ifodd\pageno
 	\else
-		\null\thispagenoheadline\vfill\eject
+		\null\thispagenoheadline
+		\vfill\eject
 	\fi
 	\thispagenoheadline
 	\centerline{\headingIsize\sc \lowercase{#1}}
@@ -291,13 +291,6 @@
 
 \def\endheadingII{}
 
-% Semantic names
-
-\let\beginchapter = \beginheadingI
-\let\endchapter   = \endheadingI
-\let\beginsection = \beginheadingII
-\let\endsection   = \endheadingII
-
 
 %%%%%%%%% D R O P C A P S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -309,10 +302,13 @@
     {\dccapfont M}%
 }%
 \vskip-3\baselineskip
+\dimen0=54pt
+\dimen1=55pt
+\dimen2=56pt
 \parshape 4
-    54pt \dimexpr(\hsize-54pt)
-    55pt \dimexpr(\hsize-55pt)
-    56pt \dimexpr(\hsize-56pt)
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
     0pt \hsize
 \noindent
 }
