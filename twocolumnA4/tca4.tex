@@ -1,0 +1,426 @@
+%%
+%% Personal plain TeX macros.
+%% Can only be used with LuaTeX, requires luaotfload.sty in a searchable path,
+%% and the Pardo version EB Garamond files.
+%% Heavily inspired by OpTeX/OpMac.
+%%
+
+
+%%%%%%%%% F O N T S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Use font loader from ConTeXt
+\input luaotfload.sty
+
+% Font names
+\font\tenrm "EBGaramond12-Regular":+onum; at 10pt
+\font\tenit "EBGaramond12-Italic" at 10pt
+\font\tensc "EBGaramond12-Regular":+pcap,letterspace=6; at 10pt
+
+\font\twelverm "EBGaramond12-Regular":+onum; at 12pt
+\font\twelveit "EBGaramond12-Italic" at 12pt
+\font\twelvesc "EBGaramond12-Regular":+smcp,letterspace=6; at 12pt
+
+% Semantic names for direct use
+\def\normalsize{%
+	\gdef\rm{\tenrm}%
+	\gdef\it{\tenit}%
+	\gdef\sc{\tensc}%
+}
+
+\def\headingIsize{%
+	\gdef\rm{\twelverm}%
+	\gdef\it{\twelveit}%
+	\gdef\sc{\twelvesc}%
+}
+
+% Use italics for emphasis
+\let\emph\it
+
+% Start with normalsize roman
+\normalsize\rm
+
+
+%%%%%%%%% P A R A G R A P H   S E T T I N G S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Default distance between lines
+\baselineskip=15pt
+
+% No extra space after periods.
+\frenchspacing
+
+% Vertical distance between paragraphs
+\parskip=0pt
+
+% Paragraph indentation
+\parindent=1em
+
+% Badness
+\emergencystretch=0pt
+\pretolerance=150
+\tolerance=2000
+\hbadness=150
+\hfuzz=3pt
+
+
+% \firstnoindent -- Don't indent next paragraph
+\def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
+\def\wipeeverypar{\global\everypar={}}
+
+% No penalties for widows and orphans, these are dealt with using \adjustpage
+\widowpenalty=0
+\clubpenalty=0
+
+%%%%%%%%% P A G E   L A Y O U T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Paper size
+\pagewidth=210mm	
+\pageheight=297mm
+
+% Undo legacy 1in origin
+\pdfvariable horigin 0in	
+\pdfvariable vorigin 0in
+
+% Typeset area distance from top left corner
+\hoffset=\dimexpr(\pagewidth/10)	
+\voffset=\dimexpr(\pageheight/10)
+
+% Ensure that first baseline starts at the same distance from the top
+\topskip=\baselineskip % I had an idea with this but forgot, leaving it in for now.
+
+% Typeset area size
+\hsize=\dimexpr(\pagewidth-3\hoffset)
+\vsize=1.5\hsize
+
+% Backup original vsize 
+\newdimen\originalvsize \originalvsize=\vsize
+
+% Defines a macro \ap:<pageno>, expands to how many lines should be adjusted.
+\def\adjustpage#1#2{%
+	\expandafter\xdef\csname ap:#1\endcsname{#2}
+	\ifnum #1=1
+		\setvsize
+	\fi
+}
+% Example: \adjustpage{15}{+2} adjusts page 15 to have 2 extra lines
+
+% This macro gets expanded last in the output routine, don't use directly.
+\def\setvsize{%
+	\global\vsize=\originalvsize
+	\ifcsname ap:\the\pageno\endcsname
+		\global\advance \vsize by \csname ap:\the\pageno\endcsname \baselineskip
+	\fi
+}
+
+
+%%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\makeheadlineplain{%
+	\vbox to0pt{%
+		\vskip-22.5pt
+  		\line{%
+  			\vbox to8.5pt{}%
+  			\the\headline
+  		}%
+  		\vss
+  	}
+	\nointerlineskip
+}
+
+\def\makeheadline{%
+    \vbox to0pt{%
+        \vss
+        \hbox to\hsize{%
+            \the\headline
+        }%
+        \vskip-\topskip
+        \vskip0.5\baselineskip % raise or lower from default
+        \hbox{}%
+    }%
+    \nointerlineskip
+}
+
+\newif\ifheadline \headlinetrue
+
+\headline{%
+	\ifheadline
+		\ifodd\pageno
+			\hss \normalsize\sc \defaultcolor 
+			\lowercase{Name of the book} \hss% recto
+		\else
+			\hss \normalsize\sc \defaultcolor 
+			\lowercase{Author Authorsson}\hss% verso	
+		\fi
+	\else
+		\hss
+		\global\headlinetrue	
+	\fi
+}
+
+% Turn off headline on current page
+\def\thispagenoheadline{\global\headlinefalse}
+
+
+%%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\makefootline{%
+	\baselineskip=24pt
+	\lineskiplimit=0pt
+	\line{%
+		\the\footline
+	}%
+}
+
+\newif\iffootline \footlinetrue
+
+\footline{%
+	\iffootline
+		\ifodd\pageno
+			\hss{\normalsize\rm \defaultcolor \folio\quad}% recto
+		\else
+			{\quad \normalsize\rm \defaultcolor \folio}\hss% verso	
+		\fi
+	\else
+		\hss
+		\global\footlinetrue	
+	\fi
+}
+
+% Turn off footline on current page
+\def\thispagenofootline{\global\footlinefalse}
+
+
+%%%%%%%%%% C O L O R S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Token for \aftergroup to reset color
+\def\colorstackpop{\pdfextension colorstack 0 pop}
+
+% Switch to CMYK color in current group. Expects four values between 0 and 1
+\def\setcmykcolor#1{%
+   	\pdfextension colorstack 0 push {#1 k #1 K}% 
+   	\aftergroup\colorstackpop
+}
+
+% Switch to RGB color in current group. Expects three values between 0 and 1
+\def\setrgbcolor#1{%
+   	\pdfextension colorstack 0 push {#1 rg #1 RG}% 
+   	\aftergroup\colorstackpop
+}
+
+% Color names
+\def\black{\setcmykcolor{0 0 0 1}}
+\def\blue{\setcmykcolor{1 1 0 0}}
+\def\red{\setrgbcolor{1 0 0}}
+
+% Semantic names for direct use
+\def\defaultcolor{\black}
+\def\hyperlinkcolor{\blue}
+\def\rubricationcolor{\red}
+
+% Example: {\hyperlinkcolor This is blue text}
+
+
+%%%%%%%%% I M A G E S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newdimen\imagewidth    \imagewidth=0pt 	% 0pt gives natural size of image
+\newdimen\imageheight   \imageheight=0pt
+\newtoks\imagedir		\imagedir{} 		% Must end with /, e.g. mypics/
+
+\def\image#1{%
+	\hbox{%
+		\saveimageresource 
+			\ifdim\imagewidth=0pt \else width\imagewidth\fi 
+            \ifdim\imageheight=0pt \else height\imageheight\fi 
+            {\the\imagedir#1}%
+      	\useimageresource\lastsavedimageresourceindex
+	}%
+}
+
+% Example: {\imageheight=4cm \image{mypicture.png}}
+
+%%%%%%%%% O U T P U T   R O U T I N E %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\output{\beforeoutput \plainoutput \afteroutput}
+
+% For two page layout, \shiftoffset is how much verso pages should move
+\newdimen\shiftoffset
+\shiftoffset = \pagewidth
+\advance \shiftoffset by -\hsize
+\advance \shiftoffset by -2\hoffset
+
+\def\beforeoutput{%
+	% Two page layout
+	\ifodd\pageno
+	\else
+		\advance \hoffset by \shiftoffset
+	\fi
+}
+
+\def\afteroutput{%
+	% Manually overriding vsize to solve widows through \adjustpage
+	\setvsize
+}
+
+%%%%%%%%% S E C T I O N I N G %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Heading level I
+\def\beginchapter#1{%
+	% Start on a recto page
+	\ifodd\pageno
+	\else
+		\null\thispagenoheadline
+		\vfill\eject
+	\fi
+	\thispagenoheadline
+	\centerline{\headingIsize\sc \lowercase{#1}}
+	\nobreak
+	\vskip 4\baselineskip
+	\nobreak
+	\firstnoindent
+}
+
+\def\endchapter{\vfil\eject}
+
+% Heading level II
+\def\beginsection#1{%
+	\vskip\baselineskip \vskip 1ex
+	\centerline{\normalsize\it #1}
+	\nobreak
+	\vskip\baselineskip \vskip -1ex
+	\nobreak
+	\firstnoindent
+}
+
+\def\endsection{}
+
+
+%%%%%%%%% D R O P C A P S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\dropcapM{%
+\vskip2\baselineskip
+\smash{%
+    \hskip0pt
+    \raise 21pt \llap{\dcquotefont “\hskip0pt}%
+    {\dccapfont M}%
+}%
+\vskip-3\baselineskip
+\dimen0=54pt
+\dimen1=55pt
+\dimen2=56pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+%%%%%%%%%%%%%% \begmulti ... \endmulti TBN p. 244, 245 -- sec. 3.14 in opmac-d.pdf
+
+\def\wipeepar{\global\everypar={}}
+\def\multiskip{\vskip0pt}      % space above and below \begmulti...\endmulti
+\newdimen\colsep \colsep=1.5em
+\newcount\tmpnum
+
+\newcount\mullines
+\def\corrsize #1{%% #1 := #1 + \splittopskip - \topskip
+   \advance #1 by \splittopskip \advance #1 by-\topskip
+}
+\def\begmulti #1 {\par\bgroup\wipeepar\multiskip\penalty0 \def\Ncols{#1}
+   \setbox6=\vbox\bgroup\penalty0
+   %% \hsize := Sirka sloupce = (\hsize+\colsep) / n - \colsep
+   \advance\hsize by\colsep
+   \divide\hsize by\Ncols  \advance\hsize by-\colsep
+   \mullines=0
+   \def\par{\ifhmode\endgraf\global\advance\mullines by\prevgraf\fi}%
+}
+\def\endmulti{\vskip-\prevdepth\vfil
+   \expandafter\egroup\expandafter\baselineskip\the\baselineskip\relax 
+   \dimen0=.8\maxdimen \tmpnum=\dimen0 \divide\tmpnum by\baselineskip 
+   \splittopskip=\baselineskip
+   \setbox1=\vsplit6 to0pt
+   %% \dimen1 := the free space on the page
+   \ifdim\pagegoal=\maxdimen \dimen1=\vsize \corrsize{\dimen1}
+   \else \dimen1=\pagegoal \advance\dimen1 by-\pagetotal \fi
+   \ifdim \dimen1<2\baselineskip
+     \vfil\break \dimen1=\vsize \corrsize{\dimen1} \fi
+   \ifnum\mullines<\tmpnum \dimen0=\ht6 \else \dimen0=.8\maxdimen \fi
+   \divide\dimen0 by\Ncols \relax
+   %% split the material to more pages?
+   \ifdim \dimen0>\dimen1 \splitpart
+   \else \balancecolumns \fi  % only balancing
+   \multiskip\egroup
+}
+\def\makecolumns{\bgroup % full page, destination height: \dimen1
+   \vbadness=20000 \setbox1=\hbox{}\tmpnum=0
+   \loop \ifnum\Ncols>\tmpnum
+      \advance\tmpnum by1
+      \setbox1=\hbox{\unhbox1 \vsplit6 to\dimen1 \hss}
+   \repeat
+   \hbox{}\nobreak\vskip-\splittopskip \nointerlineskip
+   \line{\unhbox1\unskip}
+   \dimen0=\dimen1 \divide\dimen0 by\baselineskip \multiply\dimen0 by\Ncols
+   \global\advance\mullines by-\dimen0
+   \egroup
+}
+\def\splitpart{%
+   \makecolumns % full page
+   \vskip 0pt plus 1fil minus\baselineskip \break
+   \ifnum\mullines<\tmpnum \dimen0=\ht6 \else \dimen0=.8\maxdimen \fi
+   \divide\dimen0 by\Ncols \relax
+   \ifx\balancecolumns\flushcolumns \advance\dimen0 by-.5\vsize \fi
+   \dimen1=\vsize \corrsize{\dimen1}\dimen2=\dimen1
+   \advance\dimen2 by-\Ncols\baselineskip
+   %% split the material to more pages?
+   \ifvoid6 \else
+      \ifdim \dimen0>\dimen2 \expandafter\expandafter\expandafter \splitpart
+      \else \balancecolumns % last balancing
+   \fi \fi
+}
+\def\balancecolumns{\bgroup \setbox7=\copy6 % destination height: \dimen0
+   \ifdim\dimen0>\baselineskip \else \dimen0=\baselineskip \fi
+   \vbadness=20000
+   \def\tmp{%
+      \setbox1=\hbox{}\tmpnum=0
+      \loop \ifnum\Ncols>\tmpnum
+         \advance\tmpnum by1
+         \setbox1=\hbox{\unhbox1
+              \ifvoid6 \hbox to\wd6{\hss}\else \vsplit6 to\dimen0 \fi\hss}
+      \repeat
+   \ifvoid6 \else
+      \advance \dimen0 by.2\baselineskip
+      \setbox6=\copy7
+      \expandafter \tmp \fi}\tmp
+   \hbox{}\nobreak\vskip-\splittopskip \nointerlineskip
+   \hbox to\hsize{\unhbox1\unskip}%
+   \egroup
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%         C O N T E N T
+          
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\adjustpage{2}{+2}
+%\adjustpage{5}{-1}
+
+\hyphenation{sce-ler-is-que}
+
+\begmulti 2
+\input lipsum
+\endmulti
+
+\beginsection{First section}
+\input lipsum
+\endsection
+
+\beginsection{Second section}
+\input lipsum
+\endsection
+\endchapter
+
+\beginchapter{Second chapter}
+\input lipsum
+\endchapter
+\bye

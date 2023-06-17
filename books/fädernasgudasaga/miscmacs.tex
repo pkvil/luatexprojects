@@ -1,0 +1,104 @@
+% miscmacs.tex
+
+% Draw frame, baseline, and vertical align, without moving anything around
+
+\newdimen\rulethickness \rulethickness=0.4pt\relax
+
+\def\boxlines #1{%
+    \hbox{%
+    	% The argument box
+        \setbox 0 = #1%
+        % Leader box
+        \setbox 1 = \hbox to \wd0{%
+            \xleaders\hbox to 4pt{%
+                \hskip 1pt
+                \vrule depth 0.4pt height 0.4pt width 2pt
+                \hfil
+            }%
+            \hfil
+        }%
+        \ht1=0pt \dp1=0pt \wd1=0pt 
+        \box1
+        % Bullet plus frame box
+    	\setbox 2 = \hbox{% 
+			% Bullet box
+			\setbox 3 =\hbox{%
+				\hskip -2.3pt%
+				\lower 2.5pt%
+				\hbox{$\bullet$}%
+			}%
+			\ht3=0pt \dp3=0pt \wd3=0pt
+			\box3
+			% Draw left border
+    	    \hskip -0.5\rulethickness
+    	    \vrule width \rulethickness height \ht0 depth \dp0%
+    	    % Draw right border
+    	    \hskip \wd0% 
+    	    \hskip -\rulethickness
+    	    \vrule width \rulethickness height \ht0 depth \dp0%
+    	    % Draw top border
+    	    \hskip -\wd0% 
+    	    \hskip -\rulethickness
+    	    \dimen0 = \wd0% 
+    	    \advance\dimen0 by \rulethickness
+    	    \dimen2 = \ht0% 
+    	    \advance\dimen2 by 0.5\rulethickness
+    	    \dimen4 = \ht0% 
+    	    \advance\dimen4 by -0.5\rulethickness
+    	    \dimen4 = -\dimen4
+    	    \vrule width \dimen0 height \dimen2 depth \dimen4
+    	    % Draw bottom border
+    	    \hskip -\dimen0
+    	    \dimen2 = \dp0% 
+    	    \advance\dimen2 by -0.5\rulethickness
+    	    \dimen2 = -\dimen2
+    	    \dimen4 = \dp0% 
+    	    \advance\dimen4 by 0.5\rulethickness
+    	    \vrule width \dimen0 height \dimen2 depth \dimen4
+        }%
+       	\ht2=0pt \dp2=0pt \wd2=0pt%
+       	\box2 
+        \box0
+    }%
+}
+
+
+%%%%%%%%%%%%%
+\def\myplainoutput{%
+	% Shipout
+	\shipout\vbox{
+		% \makeheadline
+		\vbox to0pt{%
+			\vskip-22.5pt
+  			\line{%
+  				\vbox to8.5pt{}%
+  				\the\headline
+  			}%
+  			\vss
+  		}%
+  		\nointerlineskip
+		% \pagebody
+		\vbox to\vsize{%
+			\boxmaxdepth\maxdepth 
+			\ifvoid\topins
+			\else
+				\unvbox\topins
+			\fi
+			\dimen0=\dp255
+			\unvbox255
+  			\ifvoid\footins
+  			\else % footnote info is present
+    			\vskip\baselineskip
+    			\footnoterule
+    			\unvbox\footins
+    		\fi
+			\ifraggedbottom
+				\kern-\dimen0 \vfil 
+			\fi
+		}%
+		\makefootline
+	}%
+	\advancepageno
+  	\ifnum\outputpenalty>-20000 \else\dosupereject\fi
+}
+%%%%%%%%%%%%%%%%%%%
