@@ -1,412 +1,31 @@
-%%
-%% Personal plain TeX macros.
-%% Can only be used with LuaTeX, requires luaotfload.sty in a searchable path.
-%%
+\input fädernas-macros
 
 
-%%%%%%%%% F O N T S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Macros for direct use:
 
-% Use font loader from ConTeXt
-\input luaotfload.sty
+% \secI{}{} is top level heading
+% Example: \secI{Part 1}{Title of part one}
 
-% Font names
+% \emph makes text italic
+% Example: {\emph emphasized text}
 
-\font\twelverm 	"DanteMTStd-Regular":+onum;+pnum;+tlig; at 12pt
-\font\twelveit 	"DanteMTStd-Italic" at 12pt
-\font\twelvesc 	"DanteMTStd-Regular":+smcp;+c2sc;letterspace=10; at 12pt
-\font\twelvetit "DanteMTStd-Regular":+onum;+titl;letterspace=10; at 12pt
-\font\twelvetitb "DanteMTStd-Regular":+onum;-titl;letterspace=10; at 12pt
+% \dropcap<X> makes a three line tall dropcap
+% Example: \dropcapL orem ipsum.
 
 
-\font\thirteenrm "DanteMTStd-Regular":+lnum;+pnum;letterspace=10; at 14pt
-\font\thirteensc "DanteMTStd-Regular":+onum;+pnum;+smcp;+c2sc;letterspace=10; at 14pt
-
-\font\fourteentit "DanteMTStd-Regular":+onum;+titl;letterspace=10; at 14pt
-\font\fourteensc "DanteMTStd-Regular":+smcp;+onum;letterspace=10; at 14pt
-\font\fourteenit "DanteMTStd-Italic":+onum;+pnum; at 14pt
-
-\font\dccapfont "DanteMTStd-Regular":+titl at 54pt
-\font\dcquotefont "DanteMTStd-Regular":+titl at 25pt
-
-\def\secIfontA{\thirteenrm}
-\def\secIfontB{\eighteenrm}
-
-\def\secIIfont{\fourteenit}
-
-% Semantic names for direct use
-
-\def\normalsize{%
-	\gdef\rm{\twelverm}%
-	\gdef\it{\twelveit}%
-	\gdef\sc{\twelvesc}%
-	\gdef\tit{\twelvetit}%
-}
-
-% Use italics for emphasis
-\def\emph{\it}
-
-% Start with normalsize roman
-\normalsize\rm
-
-
-%%%%%%%%% P A R A G R A P H   S E T T I N G S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Default distance between lines
-\baselineskip=14.06pt
-
-% Static height of first line
-\topskip=\baselineskip
-
-% No extra space after periods.
-\frenchspacing
-
-% Vertical distance between paragraphs
-\parskip=0pt
-
-% Paragraph indentation
-\parindent=1em
-
-% Lineskip & lineskiplimit
-\lineskiplimit=-1000pt
-
-% Badness
-\emergencystretch=0pt
-\pretolerance=150
-\tolerance=9999
-\hbadness=150
-\hfuzz=0pt
-
-% \firstnoindent -- Don't indent next paragraph
-\def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
-\def\wipeeverypar{\global\everypar={}}
-
-% No penalties for widows and orphans, these are dealt with using \adjustpage
-\widowpenalty=0
-\clubpenalty=0
-
-%%%%%%%%% P A G E   L A Y O U T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Paper size
-\pagewidth=150mm	
-\pageheight=225mm
-
-% Undo legacy 1in origin
-\pdfvariable horigin 0in	
-\pdfvariable vorigin 0in
-
-% Typeset area distance from top left corner
-\hoffset=\dimexpr(\pagewidth/9)\relax	
-\voffset=\dimexpr(\pageheight/9)\relax
-\advance\voffset by -\topskip
-\advance\voffset by 1ex
-
-
-% Ensure that first baseline starts at the same distance from the top
-\topskip=\baselineskip % I had an idea with this but forgot, leaving it in for now.
-
-% Typeset area size
-\hsize=\dimexpr(6\pagewidth/9)
-\vsize=\topskip \advance\vsize by 30\baselineskip
-
-% Backup original vsize 
-\newdimen\originalvsize \originalvsize=\vsize
-
-% Defines a macro \ap:<pageno>, expands to how many lines should be adjusted.
-\def\adjustpage#1#2{%
-	\expandafter\xdef\csname ap:#1\endcsname{#2}
-	\ifnum #1=1
-		\setvsize
-	\fi
-}
-% Example: \adjustpage{15}{+2} adjusts page 15 to have 2 extra lines
-
-% This macro gets expanded last in the output routine, don't use directly.
-\def\setvsize{%
-	\global\vsize=\originalvsize
-	\ifcsname ap:\the\pageno\endcsname
-		\global\advance \vsize by \csname ap:\the\pageno\endcsname \baselineskip
-	\fi
-}
-
-
-%%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\def\makeheadlineplain{%
-	\vbox to0pt{%
-		\vskip-22.5pt
-  		\line{%
-  			\vbox to8.5pt{}%
-  			\the\headline
-  		}%
-  		\vss
-  	}
-	\nointerlineskip
-}
-
-\def\makeheadline{%
-    \vbox to0pt{%
-        \vss
-        \hbox to\hsize{%
-            \the\headline
-        }%
-        \vskip-\topskip
-        \vskip0.5\baselineskip % raise or lower from default
-        \hbox{}%
-    }%
-    \nointerlineskip
-}
-
-\newif\ifheadline \headlinetrue
-
-\headline{%
-	\ifheadline
-		\ifodd\pageno
-			\hss \normalsize\sc \defaultcolor 
-			\lowercase{Name of the book} \hss% recto
-		\else
-			\hss \normalsize\sc \defaultcolor 
-			\lowercase{Author Authorsson}\hss% verso	
-		\fi
-	\else
-		\hss
-		\global\headlinetrue	
-	\fi
-}
-
-\headline{}
-
-% Turn off headline on current page
-\def\thispagenoheadline{\global\headlinefalse}
-
-
-%%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\def\makefootline{%
-	\baselineskip=14pt
-	\lineskiplimit=0pt
-	\line{%
-		\the\footline
-	}%
-}
-
-\newif\iffootline \footlinetrue
-
-\footline{%
-	\iffootline
-		\ifodd\pageno
-			\hss{\normalsize\rm \defaultcolor \folio\quad}% recto
-		\else
-			{\quad \normalsize\rm \defaultcolor \folio}\hss% verso	
-		\fi
-	\else
-		\hss
-		\global\footlinetrue	
-	\fi
-}
-
-% Turn off footline on current page
-\def\thispagenofootline{\global\footlinefalse}
-
-
-%%%%%%%%%% C O L O R S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Token for \aftergroup to reset color
-\def\colorstackpop{\pdfextension colorstack 0 pop}
-
-% Switch to CMYK color in current group. Expects four values between 0 and 1
-\def\setcmykcolor#1{%
-   	\pdfextension colorstack 0 push {#1 k #1 K}% 
-   	\aftergroup\colorstackpop
-}
-
-% Switch to RGB color in current group. Expects three values between 0 and 1
-\def\setrgbcolor#1{%
-   	\pdfextension colorstack 0 push {#1 rg #1 RG}% 
-   	\aftergroup\colorstackpop
-}
-
-% Color names
-\def\black{\setcmykcolor{0 0 0 1}}
-\def\blue{\setcmykcolor{1 1 0 0}}
-\def\red{\setrgbcolor{0.8 0 0}}
-
-% Semantic names for direct use
-\def\defaultcolor{\black}
-\def\hyperlinkcolor{\blue}
-\def\rubricationcolor{\red}
-
-% Example: {\hyperlinkcolor This is blue text}
-
-
-%%%%%%%%% I M A G E S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\newdimen\imagewidth    \imagewidth=0pt 	% 0pt gives natural size of image
-\newdimen\imageheight   \imageheight=0pt
-\newtoks\imagedir		\imagedir{} 		% Must end with /, e.g. mypics/
-
-\def\image#1{%
-	\hbox{%
-		\saveimageresource 
-			\ifdim\imagewidth=0pt \else width\imagewidth\fi 
-            \ifdim\imageheight=0pt \else height\imageheight\fi 
-            {\the\imagedir#1}%
-      	\useimageresource\lastsavedimageresourceindex
-	}%
-}
-
-% Example: {\imageheight=4cm \image{mypicture.png}}
-
-%%%%%%%%% O U T P U T   R O U T I N E %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-\output{\beforeoutput \plainoutput \afteroutput}
-
-% For two page layout, \shiftoffset is how much verso pages should move
-\newdimen\shiftoffset
-\shiftoffset = \pagewidth
-\advance \shiftoffset by -\hsize
-\advance \shiftoffset by -2\hoffset
-
-\def\beforeoutput{%
-	% Two page layout
-	\ifodd\pageno
-	\else
-		\advance \hoffset by \shiftoffset
-	\fi
-}
-
-\def\prepghook{\vbox to0pt{\kern-\voffset 
-   \hbox to0pt{\kern-\hoffset\background\hss}\vss}% 
-   \nointerlineskip 
-} 
-
-\def\background{%
-    \saveimageresource width\pagewidth height\pageheight {grid.pdf}%
-    \useimageresource\lastsavedimageresourceindex
-}
-
-% Turn off background image
-\def\background{}
-
-\def\plainoutput{\shipout\vbox{\prepghook\makeheadline\pagebody\makefootline}%
-  \advancepageno
-  \ifnum\outputpenalty>-20000 \else\dosupereject\fi}
-
-\def\afteroutput{%
-	% Manually overriding vsize to solve widows through \adjustpage
-	\setvsize
-}
-
-%%%%%%%%% S E C T I O N I N G %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\def\secI#1#2{%
-	\vfil\break
-	\ifodd\pageno
-	\else
-		\null\thispagenofootline
-		\vfill\eject
-	\fi
-	\centerline{\noindent\fourteensc \lowercase{#1}}
-	\vskip0.8\baselineskip
-	\centerline{\noindent\fourteentit \uppercase{#2}}
-	\vskip2.2\baselineskip
-}
-
-
-\def\secII#1#2{%
-	\vskip\baselineskip
-	\vskip-1ex
-	{\secIIfont\red
-	 \raggedright\noindent 
-	 \if 😀#1😀\else
-	 	Kapitel #1\hskip0.33em \char"00B7\hskip0.33em
-	 \fi
-	 #2\par%
-	}%
-	%\vskip1\baselineskip
-	\vskip1ex
-	\firstnoindent
-}
-
-
-%%%%%%%%% D R O P C A P S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\def\dropcapD{%
-\vskip2\baselineskip
-\smash{%
-    \hskip0pt
-    \raise 21pt \llap{\dcquotefont \hskip0pt}%
-    {\dccapfont D}%
-}%
-\vskip-3\baselineskip
-\dimen0=41pt
-\dimen1=45pt
-\dimen2=45pt
-\parshape 4
-    \dimen0 \dimexpr(\hsize-\dimen0)
-    \dimen1 \dimexpr(\hsize-\dimen1)
-    \dimen2 \dimexpr(\hsize-\dimen2)
-    0pt \hsize
-\noindent
-}
-
-\def\dropcapS{%
-\vskip2\baselineskip
-\smash{%
-    \hskip-2pt
-    \raise 21pt \llap{\dcquotefont \hskip0pt}%
-    {\dccapfont S}%
-}%
-\vskip-3\baselineskip
-\dimen0=23pt
-\dimen1=28pt
-\dimen2=28pt
-\parshape 4
-    \dimen0 \dimexpr(\hsize-\dimen0)
-    \dimen1 \dimexpr(\hsize-\dimen1)
-    \dimen2 \dimexpr(\hsize-\dimen2)
-    0pt \hsize
-\noindent
-}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%         C O N T E N T
-          
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Final touches
 
 %\adjustpage{2}{+2}
 %\adjustpage{5}{-1}
 
+\hyphenation{asa-gud-arne skul-le ur-tidskonst-när-erna själf-upp-off-ring}
 
-%%% Frontmatter
 
-\parindent0pt
-
-\def\ToCPartLine#1{%
-	\vskip0.5\baselineskip
-    {\twelvesc\uppercase{#1}}
-    \vskip0.5\baselineskip
-}
-
-    \newcount\testpg \testpg=1
-
-\def\TocChapLine#1#2{{%
-	\advance\leftskip by 2em
-	\noindent\leavevmode
-	\it
-	\llap{%
-		\hbox to 1em{\hfil #1}\quad
-	}%
-	\global\advance\testpg by 3\relax
-	#2\hfill \the\testpg\par
-}}
-
-\thispagenoheadline
-\thispagenofootline
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \secII{}{Innehållsförteckning}
-\vskip2\baselineskip
+\vskip\baselineskip
+\parindent0pt
 
 \TocChapLine{}{Till läsaren}
 
@@ -461,11 +80,9 @@
 \vskip\baselineskip
 \TocChapLine{}{Mytologisk namnförteckning}
 
-\thispagenoheadline
 \thispagenofootline
 
 \parindent1em
-
 \vfil\break
 
 \secII{}{Till läsaren}
@@ -618,7 +235,7 @@ Skuld de förnämsta.
 
 \secII{3}{Underjorden. Burs söner. Urtidskonstnärerna. Odens själfuppoffring.}
 
-Underjorden är den älsta delen af skapelsen och var bebodd och smyckad,
+\dropcapU nderjorden är den älsta delen af skapelsen och var bebodd och smyckad,
 långt innan jorden inrättades till bostad åt människoslägtet, ja innan
 Asgard vardt bebygdt af asagudarne.
 
@@ -682,7 +299,7 @@ och skaparemakt.
 
 \secII{4}{Rimtursarnes undergång. Vakten vid Hvergelmer.}
 
-Nu kände han sig i stånd att utföra det värk han hade i sinnet: att
+\dropcapN u kände han sig i stånd att utföra det värk han hade i sinnet: att
 befria jorden från urgiganterna. Hans bröder Höner och Lodur förenade
 sig med honom till företagets fullgörande. De dödade Ymer genom att
 öppna hans hals-ådror. Ur såret frambrusade en blodström, som växte till
@@ -710,7 +327,7 @@ Egil och Slagfinn. De voro förträfflige bågskyttar och skidlöpare.
 
 \secII{5}{Världsskapelsen fortsättes.}
 
-Ur det blodhaf, som betäckte jorden, lyfte Oden och hans bröder de
+\dropcapU r det blodhaf, som betäckte jorden, lyfte Oden och hans bröder de
 inunder liggande grunderna så, att i midten uppstod det land, som kallas
 Midgard, och på randen af jordskifvan det land, hvars norra och östra
 delar heta Jotunheim. Mällan Midgard och Jotunheim ligger en bred
@@ -790,7 +407,7 @@ mull och utbreda den öfver Midgards kala stenmarker.
 
 \secII{6}{Världskvarnen.}
 
-För detta ändamål -- och äfven för andra -- byggde urtidskonstnärerna en
+\dropcapF ör detta ändamål -- och äfven för andra -- byggde urtidskonstnärerna en
 ofantlig kvarn, Grotte. »Skärens kvarn», »stormarnes kvarn» kallas hon
 äfven. Dess bjälklag restes i underjorden på Nidafjället rundt omkring
 källan Hvergelmer, som är moderkällan till alla världens vatten, till
@@ -874,7 +491,7 @@ världens första eldborr.
 
 \secII{7}{Världsskapelsen fullbordas.}
 
-Det var bestämdt, att Oden och hans ättlingar, asagudarne, skulle ega
+\dropcapD et var bestämdt, att Oden och hans ättlingar, asagudarne, skulle ega
 rike och borgar i den öfversta grenknippan af Yggdrasil, medan
 vanagudarne skulle fortfarande bebygga underjorden. Denna bestämmelse
 hade sin grund i de båda gudaslägternas olika skaplynne. Oden var född
@@ -953,12 +570,11 @@ vartecken af asagudarnes vaksamhet och vård om världens trygghet.
 
 
 
-
 \secI{Andra delen}{URTIDENS FRIDSÅLDER}
 
 \secII{8}{Fredsförbundet. Gudaklenoderna.}
 
-Det nyskapade, med växtlighet prydda Midgard låg nu i sitt vårlifs
+\dropcapD et nyskapade, med växtlighet prydda Midgard låg nu i sitt vårlifs
 fägring och var en syn, som fröjdade äfven gudarnes blickar.
 Jotunheimsmakterna, som hemsöka jorden med frost och torka, med
 hvirfvelvindar och öfversvämningar, höllo sig ännu stilla och lämnade
@@ -1027,7 +643,7 @@ af henne, ega de sin kraft, men annars icke.
 
 \secII{9}{Människoskapelsen.}
 
-Oden, Höner och Lodur kommo till det härliga Midgard, som de skapat, och
+\dropcapO den, Höner och Lodur kommo till det härliga Mid\-gard, som de skapat, och
 vandrade där. Mycket var där att se och fröjda sig åt; men något
 saknades ändå: varelser, som kunde glädja sig åt Midgard, som åt ett
 välprydt hem, och tacka dem, som förlänat dem hemmet. Gudarne gingo
@@ -1089,13 +705,10 @@ det goda, för att upplysa dem och binda dem vid sig med heliga band,
 fattade fördenskull gudarne det beslut att sända dem en uppfostrare och
 lärare.
 
-\bye
 
-\paragraph{X.}
+\secII{10}{Heimdall kulturbringaren.}
 
-\paragraph{HEIMDALL KULTURBRINGAREN.}
-
-Till människornas lärare utsågs den rena och heliga eldens gud Heimdall,
+\dropcapT ill människornas lärare utsågs den rena och heliga eld\-ens gud Heimdall,
 kort efter det att han blifvit född. Huru det tillgick med hans födelse
 är förut omtaladt. Han räknas till vanernas slägt, emedan han genom de
 nio mödrarna vid världskvarnens vridstång bragtes i dagen å underjordens
@@ -1111,8 +724,6 @@ hvilket Yggdrasil hvälfver evigt gröna bladmassor. Allt, som kommer i
 beröring med den källans vatten, får en skinande hvit färg och stärkes
 underbart, ty vattnet ger världsalltet dess fysiska lif och kallas
 därför »jordens kraft». Barnet fick först en dryck därur.
-
-\protect\hypertarget{lb1625905.xhtmlux5cux23start21}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start21-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start21-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start21-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start21-d}{}{}
 
 Därefter fördes det till Mimers källa. Denna är sirad med en sjufaldig
 infattning af guld, och diktens sådd växer kring dess säfomkransade
@@ -1150,7 +761,6 @@ han kommit med en sädeskärfve till deras land, kallade de honom Skef
 (»kärfve»). Så växte han upp hos detta folk och blef ännu i unga år
 deras undervisare och lärare i åkerbruk och alla slöjder, i tidsrunor
 och evighetsrunor (världslig kunskap och religiös). Sedan han
-\protect\hypertarget{lb1625905.xhtmlux5cux23start22}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start22-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start22-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start22-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start22-d}{}{}
 vuxit upp till yngling, gjorde de honom till sin styresman och kallade
 honom Rig (»höfding»).
 
@@ -1184,8 +794,6 @@ gång som de hafva mänsklig. De gjordes af honom till halfsyskon och
 ålades därmed att vänligt och billigt bemöta hvarandra. Fördenskull
 kallas de tre stånden »Heimdalls heliga ätter».
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start23}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start23-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start23-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start23-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start23-d}{}{}
-
 Heimdall lefde länge som människa bland våra urfäder och underkastade
 sig den allmänna människolotten att åldras och dö. Han hade anordnat,
 att hans lik skulle bäras ned till den lilla vik, där han som barn
@@ -1204,11 +812,10 @@ i Asgard och i sin familjekrets.
 
 Sköld-Borgar efterträdde honom som höfding och domare i Aurvangalandet.
 
-\paragraph{XI.}
 
-\paragraph{DE AF HEIMDALL UTLÄRDA HELIGA RUNORNA.}
+\secII{11}{De af Heimdall utlärda heliga runorna.}
 
-Den heliga runkunskap, hvaraf Heimdall lärt människorna så mycket, som
+\dropcapD en heliga runkunskap, hvaraf Heimdall lärt människorna så mycket, som
 är dem nyttigt att veta, var först i Mimers ego. Han hade den likväl
 icke af sig själf, utan hade hämtat den ur visdomskällan, som han vaktar
 under världsträdets mällersta rot. Genom själfuppoffring i sin ungdom
@@ -1224,7 +831,6 @@ och bekymmer;
 läkerunornas, som förläna läkande kraft;
 
 brimrunornas, som ränsa luften från skadelystna väsen
-\protect\hypertarget{lb1625905.xhtmlux5cux23start24}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start24-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start24-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start24-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start24-d}{}{}
 och gifva makt öfver vind och våg, när det gäller att frälsa seglare ur
 sjönöd, samt makt öfver elden, när han antändt människoboningar;
 
@@ -1249,21 +855,20 @@ händer, medan vi lefva!»
 Om Heimdalls sonson, Borgar-Skölds son Halfdan, har det sjungits, att
 han, den unge,
 
-{»lärde sig runor,}\\
-{evighetsrunor}\\
-{och jordelifsrunor;}\\
-{han lärde sig sedan}\\
-{att människor frälsa,}\\
-{döfva svärds-egg,}\\
-{lugna hafvet,}\\
-{fågelsång tyda,}\\
-{dämpa eldar,}\\
-{sona och döfva,}\\
-{sorger häfva.»}\\
+{»lärde sig runor,}
+{evighetsrunor}
+{och jordelifsrunor;}
+{han lärde sig sedan}
+{att människor frälsa,}
+{döfva svärds-egg,}
+{lugna hafvet,}
+{fågelsång tyda,}
+{dämpa eldar,}
+{sona och döfva,}
+{sorger häfva.»}
 
 Åtgärder vordo i urtiden träffade att sprida dessa välgörande runor
 bland alla varelseslägter. Oden utbredde dem
-\protect\hypertarget{lb1625905.xhtmlux5cux23start25}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start25-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start25-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start25-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start25-d}{}{}
 bland asarne; alfen Dain och Mimersonen Dvalin, som fått lära dem af
 Mimer, spredo dem bland alfer och dvärgar. Genom Heimdall kommo de till
 människorna. Den goda gåfvan, blandad i heligt mjöd, sändes vida vägar,
@@ -1273,15 +878,14 @@ upptagne, äfven de, i urtidens fridsförbund, och Mimer sände dem runor,
 hvilka grundlagt den kunskap, som finnes hos Jotunheimsslägten och sedan
 af den blifvit illa brukad.
 
-\paragraph{XII.}
 
-\paragraph{ASAGUDARNE.}
+\secII{12}{Asagudarne.}
 
-Den vakt af stridbare gudar, som tagit bostäder på Yggdrasils öfre
+\dropcapD en vakt af stridbare gudar, som tagit bostäder på Yggdrasils öfre
 grenknippa i Asgard, för att därifrån öfvervaka och skydda världen, äro
 desse:
 
-1) \emph{Oden}, allfadern och tidsåldrarnas fader. Sedan ofridsåldern
+1) {\emph Oden}, allfadern och tidsåldrarnas fader. Sedan ofridsåldern
 kommit i världen, kallas han äfven valfader (»de på valplatsen fallnes
 fader»), härfader, segerfader, och han bär därjämte många andra namn.
 Hans växt är majestätisk, hans panna hög, hans ögonbryn starkt tecknade,
@@ -1299,7 +903,6 @@ Han eger en åttafotad häst Sleipner, den ypperste af alla springare.
 Denne hade han icke i begynnelsen, utan fick den genom en händelse, som
 sedan skall omtalas. I sadeln på Sleipner och följd af sina ulfhundar
 Gere och Freke
-\protect\hypertarget{lb1625905.xhtmlux5cux23start26}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start26-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start26-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start26-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start26-d}{}{}
 jagar han stundom nattetid genom luftrymderna, för att ränsa dem från de
 skadliga väsen, som kallas gifer och tunridor och äro af rimtursarnes
 och sjukdomsandarnes slägt. Oden är världens beskyddare samt folkens och
@@ -1331,7 +934,6 @@ barmhärtige belöning. Goda sedeläror har han gifvit människornas barn.
 »Hel de gifvande!» har han ropat till dem, utanför hvilkas dörrar
 vandraren står hungrig och förfrusen. Själf en visdomssökare, som
 genomletat världarna och gästat fiendtliga jätteväsen, för att finna
-\protect\hypertarget{lb1625905.xhtmlux5cux23start27}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start27-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start27-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start27-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start27-d}{}{}
 sanningar, uppmanar han enhvar att odla sitt vett. Det gläder honom, när
 de dödlige stifta vänskap och troget bevara den. Han varnar mot
 öfvermod, och han vill, att en man skall föredraga fattigdom med
@@ -1366,10 +968,8 @@ skämta vid mjödet, ja äfven inför människorna skämta med sig själf; men
 detta är krusningar på ytan af en ande, hvars djup griper med aningsfull
 vördnad.
 
-2) \emph{Tor}, son af Oden och Frigg. I hans skaplynne ligger ingen
+2) {\emph Tor}, son af Oden och Frigg. I hans skaplynne ligger ingen
 dunkel gåta. Det skaplynnet är klart som en genomskinlig källas vatten.
-
-\protect\hypertarget{lb1625905.xhtmlux5cux23start28}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start28-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start28-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start28-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start28-d}{}{}
 
 Tor har breda skuldror och ståtlig kroppsbyggnad, hvars resning och
 lemmar nogsamt visa hans ofantliga styrka. Bland gudarne finnes ingen så
@@ -1403,11 +1003,10 @@ ty denne var ju Odens ungdomsvän och upptagen af honom i Asgard. Tor
 var, som de andre gudarne, road af Lokes infall och upptåg, och tog
 honom stundom med sig på sina utfärder. Men sedan Tor blifvit några
 gånger
-\protect\hypertarget{lb1625905.xhtmlux5cux23start29}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start29-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start29-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start29-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start29-d}{}{}
 grundligt lurad af Loke, förlorade han allt förtroende för honom och
 tålde honom illa.
 
-3) \emph{Balder}, en ljusgud, »solskifvans mäktige främjare», hvars
+3) {\emph Balder}, en ljusgud, »solskifvans mäktige främjare», hvars
 uppgift i världsordningen var att å sin häst eller sitt luftskepp
 Ringhorne vara en skyddsvakt för Sol och Måne på deras färder öfver
 himmelen. Balder är son af Oden och Frigg. Han är den mäst högvuxne
@@ -1418,14 +1017,14 @@ han är, så god och ädelsinnad är han äfven. Därför vardt han lofvad och
 älskad af alla väsen, som äro i stånd att fatta tillgifvenhet för hvad
 som är hjärtegodt och rent. Försonlig mot sina fiender och böjd att
 förlåta, var han världens fredsstiftare och milde domare. Dömde
-\emph{han} strängt, då stod det med den dömdes sak så illa, att domen
-icke \emph{kunde} jämkas eller förmildras. Människorna hafva uppkallat
+{\emph han} strängt, då stod det med den dömdes sak så illa, att domen
+icke {\emph kunde} jämkas eller förmildras. Människorna hafva uppkallat
 de hvitaste blommor efter honom, emedan de i dessas hvithet trott sig
 finna något, som liknade Balders pannas glans. Han blef gift med
 måndisen Nanna, dotter af månguden Nöckve (»skeppsegaren»), och hade med
 henne sonen Forsete.
 
-4) \emph{Had}, en vacker yngling, till lynnet obetänksam, häftig,
+4) {\emph Had}, en vacker yngling, till lynnet obetänksam, häftig,
 lättrörd, lättförledd, lidelsefull och med stormande känslor. Hans
 uppförande berodde af det inflytande, hvarunder han kom. En tid lät han
 sig leda af Balder och gjorde sig då förtjent af allas loford; därefter
@@ -1438,13 +1037,11 @@ oöfverträfflig och förde alla vapen väl, äfven bågen, i hvars skötande
 han öfverträffades endast af Valands broder Egil, väktaren vid
 Hvergelmers och Jotunheims vatten, samt af Egils son Ull.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start30}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start30-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start30-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start30-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start30-d}{}{}
-
-5) \emph{Forsete}, Balders son och afbild, rättvisans gud, skarpsinnig i
+5) {\emph Forsete}, Balders son och afbild, rättvisans gud, skarpsinnig i
 vanskliga rättsfrågors afgörande och mer än någon i stånd att förlika
 tvistande.
 
-6) \emph{Brage}, den långskäggige, Valhalls skald och harpolekare, son
+6) {\emph Brage}, den långskäggige, Valhalls skald och harpolekare, son
 af Oden och gift med Idun, som eger föryngringens äpplen. Ståtlig tager
 han sig ut, där han sitter vid dryckesbordet i Valhall, helt nära Odens
 högsäte, och han dväljes gärna vid mjödhornet, hvarför också den
@@ -1455,7 +1052,7 @@ förut druckit till ära för Oden, Njord och Fröj. Bägaren, som egnas
 Brage, kallas löftets bägare, ty vid den aflägges löfte om en eller
 annan storbragd, värdig att af skalder besjungas.
 
-7) \emph{Vidar}, son af Oden och jättekvinnan Grid. Han är tystlåten,
+7) {\emph Vidar}, son af Oden och jättekvinnan Grid. Han är tystlåten,
 intager blygsamt det lägsta sätet vid gudabordet i Valhall och stiger på
 Odens tillsägelse upp och fyller hornet åt andra, äfven åt den
 föraktlige Loke, utan att visa sig kränkt af sådan tjänstgöring. Han har
@@ -1464,7 +1061,7 @@ Tor den starkaste af alla asagudar. Än färre anade, att det är han, den
 hjältemodige tigaren, som skall i Ragnarök-striden hämnas sin fallne
 fader.
 
-8) \emph{Tyr}, son af Oden och den fagra jättekvinna, som vardt jätten
+8) {\emph Tyr}, son af Oden och den fagra jättekvinna, som vardt jätten
 Hymers maka, har varit Tors ledsagare på mer än en af dennes
 äfventyrliga färder i Jotunheim, och säkert är, att Tor icke kunde haft
 en modigare och pålitligare. Tyr är de i fylkingarnes led kämpande
@@ -1475,12 +1072,11 @@ hand som pant i Fenrersulfvens gap och fick den afbiten vid handleden.
 Han kämpar sedan med den vänstra. Det kan sägas, att en här utan
 fältherre saknar sin högra hand och kämpar vänsterhändt. Fältherrarnes
 förebild är
-\protect\hypertarget{lb1625905.xhtmlux5cux23start31}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start31-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start31-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start31-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start31-d}{}{}
 Oden, som uppfunnit den viggformiga slagordningen. Soldaternas förebild
 är Tyr. Oden och Tyr äro som två händer, som i förening tillvinna sig
 segern.
 
-9) \emph{Vale}, son af Oden och aftonrodnads-alfen Billings dotter, den
+9) {\emph Vale}, son af Oden och aftonrodnads-alfen Billings dotter, den
 »solhvita» Rind. Föddes, för att på Had hämnas Balders död, som annars
 skulle förblifvit ohämnad. Nattgammal uppfyllde han detta kall.
 
@@ -1488,7 +1084,7 @@ Dessa gudar äro de egentlige asarne. Till dem komma såsom upptagne i
 Valhall tre vanagudar, Njord, Fröj och Heimdall, samt en af alfernas
 stam, Ull.
 
-10) \emph{Njord}, broder till Odens maka Frigg. Han är segelvägarnes,
+10) {\emph Njord}, broder till Odens maka Frigg. Han är segelvägarnes,
 sjöfartens, fiskets, handelns och rikedomens gud och som sådan flitigt
 dyrkad. Han födde med sin syster guden Fröj och nio döttrar, bland
 hvilka den underbart sköna Fröja. De andra åtta äro Fröjas diser. Bland
@@ -1503,7 +1099,7 @@ urtidskonstnären Valand, Ivaldesonen, som genom det oblidkeliga och
 grymma hat han fick till gudarne förvandlades till sin natur och vardt
 ett fördärfligt jätteväsen.
 
-11) \emph{Fröj}, årsväxtens människovänlige herre. Hans födelse hälsades
+11) {\emph Fröj}, årsväxtens människovänlige herre. Hans födelse hälsades
 med glädje af alla ätter, utom jättarnes, och gudarne skänkte honom
 Alfheim i tandgåfva. Fröj vardt därigenom furste öfver alferna, bland
 hvilka Ivaldes tre söner voro de märkligaste. Och eftersom bruket var,
@@ -1512,7 +1108,7 @@ höfdingar och förtroendemän, så sändes Fröj att uppfostras hos Ivaldes
 söner -- den blifvande skördeguden hos de naturvärkmästare, som smidde
 världsgagnande gudaklenoder och växtlighetssmycken. Huru Valand svek
 sina plikter mot
-fostersonen\protect\hypertarget{lb1625905.xhtmlux5cux23start32}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start32-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start32-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start32-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start32-d}{}{},
+fostersonen,
 skall förtäljas sedan; likaledes huru Fröj friade till jättedottern
 Gerd. -- Om Fröjs skaplynne kan det vara nog att upprepa det vitsord,
 som Tyr i ett skaldestycke gifvit honom: »Fröj är (efter Balders död)
@@ -1520,7 +1116,7 @@ den bäste af bålde ryttare i asars gårdar; han kommer ingen mö och ingen
 mans hustru att begråta förlusten af sina kära, och han vill lösa enhvar
 ur band och bojor».
 
-12) \emph{Heimdall}, den heliga eldens gud. Om hans födelse och lefnad
+12) {\emph Heimdall}, den heliga eldens gud. Om hans födelse och lefnad
 bland människorna är förut taladt. Sedan han fulländat sitt vigtiga kall
 i Midgard och blifvit upptagen i Asgard, har Oden anförtrott åt honom
 vakten på bron Bifrost. Emedan den norra broänden, som ligger utanför
@@ -1539,13 +1135,12 @@ ser lika väl, natt som dag, hundra raster omkring sig, och hans hörsel
 hyst ovilja, och genom sin skarpsynthet och oaflåtna vaksamhet har han
 mer än en gång omintetgjort dennes listiga anslag.
 
-13) \emph{Ull.} Innan Sif, den guldlockiga disen, vardt Tors maka, hade
+13) {\emph Ull.} Innan Sif, den guldlockiga disen, vardt Tors maka, hade
 hon varit gift med Ivaldesonen Egil, den store bågskytten och
 skidlöparen, och med honom födt sonen Ull, som blef en mästare i sin
 faders idrotter och därför kallas bågeguden, jagtguden, skidguden. När
 Sif giftes med Tor, vardt äfven Ull upptagen i Asgard och fick gudarang.
 Ulls skidor äro ett konstvärk från Ivaldesönernas värkstad; de
-\protect\hypertarget{lb1625905.xhtmlux5cux23start33}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start33-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start33-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start33-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start33-d}{}{}
 kunna, i likhet med hans faders, begagnas å vatten, såväl som å land,
 och de kunna äfven begagnas som sköld. Ull är vacker, smärt och smidig
 och i allo en utmärkt stridsman. Därtill kommer, att han har en
@@ -1581,7 +1176,6 @@ förfärligare än han. De arbetade i endrägt tillsammans på gudarnes och
 världens fördärf. Gullveig, som först framföddes af rimtursen Rimner,
 vardt tre gånger född till världen af olika jätteföräldrar och tre
 gånger af gudarne bränd. Det
-\protect\hypertarget{lb1625905.xhtmlux5cux23start34}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start34-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start34-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start34-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start34-d}{}{}
 oaktadt lefver hon ännu. Hon är en och tre på samma gång, och det är på
 henne den Ragnaröksiande sången (Völuspa) syftar, när den talar om »de
 tre förskräckliga tursamöar», hvilkas ankomst från Jotunheim gjorde slut
@@ -1605,7 +1199,7 @@ Asgard har många präktiga gudaborgar. Förnämst bland dem är Odens borg
 Valhall. Det namnet, som betyder »de på slagfälten kårades hall» hade
 borgen icke i begynnelsen, utan fick det under ofredens världsålder,
 sedan krig uppkommit i Midgard. Den kallas äfven
-Bilskirner{\protect\hyperlink{lb1625905.xhtmlux5cux23n1}{1}}. Det
+Bilskirner. Det
 närmaste området kring Valhall heter Gladsheim, och där växer lunden
 Glaser, »som står med gyllne löf utanför Odens portar». Vidsträckt och
 guldstrålande står Valhall på Gladsheims mark. Salen, där asagudarne
@@ -1614,7 +1208,6 @@ bjälkad med spjutskaft, taklagd med silfversköldar och bonad med
 guldbrynjor och vapen. Valhall har 540 stockvärk och 540 portar, dessa
 så stora, att när en gång Ragnarökstriden kommer, skola genom hvarje
 port 800 einheriar (kårade hjältar) på en gång
-\protect\hypertarget{lb1625905.xhtmlux5cux23start35}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start35-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start35-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start35-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start35-d}{}{}
 tåga ut. Och dock är det endast halfva antalet einheriar, som bor i
 Valhall; den andra hälften kåras af Fröja och bor hos henne. Einheriarne
 tillbringa sina dagar dels med fäster, vid hvilka sköna stridsdiser,
@@ -1649,13 +1242,10 @@ emedan Egil och Ull äro de ypperste bågskyttarne. Vidar den tyste har
 också ett landområde, Vide, bevuxet med ris och högt gräs; det utgör en
 del af Vigrids stora slätt, på hvilken Ragnarökstriden skall utkämpas.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start36}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start36-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start36-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start36-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start36-d}{}{}
 
-\paragraph{XIII.}
+\secII{13}{Tors och Egils vänskap. Ivaldeslägten.}
 
-\paragraph{TORS OCH EGILS VÄNSKAP. IVALDESLÄGTEN.}
-
-Såsom den gamle jätten Vaftrudner själf sagt, ha jättarne ett ondt gry i
+\dropcapS åsom den gamle jätten Vaftrudner själf sagt, ha jättarne ett ondt gry i
 sig, och det tjenade i längden till föga, att de hade blifvit upptagne i
 det fredsförbund, som makterna i oskuldstiden slöto med hvarandra.
 Jättarne tillväxte och förökade sig i Jotunheim, och sedan de blifvit
@@ -1686,7 +1276,6 @@ höfdingarne för den gränsvakt, som var uppställd mot Jotunheim, nämligen
 Ivalde och hans söner, höllo den trohetsed de svurit gudarne. Desse
 alffurstar, som fått sig vakten anförtrodd längs hela det vattendrag,
 som från
-\protect\hypertarget{lb1625905.xhtmlux5cux23start37}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start37-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start37-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start37-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start37-d}{}{}
 Hvergelmers källa rinner upp till jordytan och skiljer Midgard från
 Jotunheim, hade växtlighetsdiser till systrar och hustrur och voro
 således äfven genom slägtskapsband knutna till de makter, som skydda
@@ -1718,17 +1307,11 @@ skidlöparefolk, skridfinnarne. Han kallas fördenskull äfven Finnkonung.
 Han var en väldig dryckeskämpe och lika skicklig att handtera spjutet
 som Egil bågen.
 
-{\_\_\_\_\_\_\_\_}
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start38}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start38-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start38-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start38-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start38-d}{}{}
 
-\paragraph{III.}
+\secI{Tredje Delen}{Syndens och ofridens tidsålder.}
 
-\paragraph{SYNDENS OCH OFRIDENS TIDSÅLDER.}
-
-\paragraph{XIV.}
-
-\paragraph{TROLLDOMSRUNORNA.}
+\secII{14}{Trolldomsrunorna.}
 
 Ofvan är berättadt, huru gudarne sände Heimdall till urmänniskorna, för
 att lära dem seder, nyttiga och prydande konster och heliga runor och
@@ -1752,7 +1335,6 @@ förstod att gifva skadliga krafter åt föremål, som i sig själfva voro
 oskadliga; hon uppfann den onda säjden, hvarmed man kan trolla ofall,
 sjukdom och död på människor. Från sin säjdstol utlärde hon de
 trollspråk,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start39}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start39-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start39-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start39-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start39-d}{}{}
 hvarmed skadefröjden alltsedan velat vålla ofred och olycka, slå med
 sinnesförvirring, sjukdom och död. Hon hade Lokes inställsamma later,
 och det dröjde länge, innan gudarne trodde henne om ondt. Hon var Friggs
@@ -1787,7 +1369,7 @@ kringvandrade hon i Midgard, där hon kallades Heid (ett namn, som i
 aflägsen forntid betydt »trollkvinna»). Likasom Heimdall gick med heliga
 runor från gård till gård i Aurvangalandet, gick hon från gård till gård
 därstädes med sina oheliga, »alltid efterlängtad af elakt
-kvinnfolk\protect\hypertarget{lb1625905.xhtmlux5cux23start40}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start40-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start40-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start40-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start40-d}{}{}».
+kvinnfolk».
 Hvad ondt hon därmed gjorde kan icke mätas och icke skildras. Äfven i
 Asgard lyckades hon innästla sig. När gudarne upptäckt hvem hon var,
 brände de henne för andra gången med samma påföljd som den förra. Loke
@@ -1799,9 +1381,8 @@ slukade Loke hennes hjärta. Då födde han till världen pästjättinnan
 Leikin (med orätt kallad Hel), som blef drottning öfver rimtursarne och
 sjukdomsandarne i Nifelhel.
 
-\paragraph{XV.}
 
-\paragraph{JÄTTARNE VILJA UNDERRÄTTA SIG OM TORS STYRKA.}
+\secII{15}{Jättarne vilja underrätta sig om Tors styrka.}
 
 Alltsedan Tor hade dräpt Vingner och Lora, gingo bland jättarne rykten,
 att han var omätligt stark och af obetvingligt mod. Det var för dem af
@@ -1824,7 +1405,6 @@ snarare mycket, som kunde göra en kuslig till mods. Tor och Loke
 vandrade länge genom halfmörker, därefter genom mörker, och slutligen,
 när de blifvit rätt trötta, var det nästan som natt omkring dem. Dock
 kunde man skymta
-\protect\hypertarget{lb1625905.xhtmlux5cux23start41}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start41-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start41-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start41-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start41-d}{}{}
 nära föremål. En skog syntes ligga tätt framför dem, och öfver den
 skönjde de en människoliknande skepnad, alldeles ofantligt hög. Skogen
 syntes som busksnår i jämförelse med honom. I detsamma hördes brak och
@@ -1856,7 +1436,6 @@ Tor vill annars aldrig slå sofvande man; men nu förekom det honom nödigt
 att göra ett undantag. Han lyfte hammaren och lät den med asakraft slå
 ned på jättens panna. Denne grinade litet i sömnen, men pannan var hel,
 och
-\protect\hypertarget{lb1625905.xhtmlux5cux23start42}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start42-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start42-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start42-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start42-d}{}{}
 han fortfor att snarka. Då spände Tor sitt starkhetsbälte hårdare kring
 midjan och slog än ett slag. Men utan större värkan. Han slog ett
 tredje. Då vaknade resen, förde handen till tinningen och mumlade, att
@@ -1889,7 +1468,6 @@ båda färdemännen gingo fram och hälsade höfdingen. Denne bjöd dem
 välkomne och sporde hvad piltarne hette. Tor och Loke sade sina namn.
 Borden gjordes i ordning för en måltid, hvari de främmande bjödos att
 deltaga. Medan man spisade,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start43}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start43-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start43-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start43-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start43-d}{}{}
 föll talet på idrotter. Fjalar berömde sina män där i salen för
 skicklighet i hvarjehanda sådana, och frågade i hvilka idrotter gästerna
 voro bäst öfvade. Loke svarade, att han trodde sig innehafva konsten att
@@ -1921,7 +1499,6 @@ brottare, och jag önskar se honom bevisa det. Med någon af mina män här
 inne vill jag dock icke, att han försöker sina krafter; ty då skulle det
 gå honom illa. Men ropa in min fostermor Elle!» I detsamma inträdde i
 salen en käring, som
-\protect\hypertarget{lb1625905.xhtmlux5cux23start44}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start44-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start44-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start44-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start44-d}{}{}
 såg mycket ålderstigen och skröplig ut. Tor skulle vägrat att brottas
 med henne, men hon grep tag i honom och han måste. Han fann, att hon var
 vådligt stark; ju fastare han tog i, dess fastare stod hon. Knep mot
@@ -1954,7 +1531,6 @@ Från en senare tid förtäljes denna sägen så, att icke blott Loke, utan
 äfven Tjalve och Raskva, Egils fosterbarn, följde Tor på färden till
 Fjalar, som i den berättelsen kallas Utgardaloke, samt att Tjalve bar
 Tors matsäck, tills de första
-\protect\hypertarget{lb1625905.xhtmlux5cux23start45}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start45-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start45-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start45-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start45-d}{}{}
 natten lade sig att hvila i Skrymers vante. Under natten inträffade den
 af Skrymers snarkningar orsakade jordbäfningen. Då Tor fram mot morgonen
 gick ut och fick se jätten, ville han slå ihjäl honom; men denne vaknade
@@ -1981,11 +1557,8 @@ besegrades, ty Huge var jättehöfdingens hug (tanke), som hann till målet
 förr än han. Om Tor säges det, att han vid dryckestäflingen drack så
 mycket, att hafvet märkbart sjönk, ehuru detta föga syntes i hornet.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start46}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start46-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start46-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start46-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start46-d}{}{}
 
-\paragraph{XVI.}
-
-\paragraph{TORS FÄRD TILL JÄTTEN HYMER.}
+\secII{16}{Tors färd till jätten Hymer.}
 
 Asagudarne voro en dag samlade till ett fästligt samkväm, där man vid
 måltiden pröfvade och fann behag i steken af vildt, som jagats och
@@ -2014,7 +1587,6 @@ beskedet återvände Tor till Asgard och meddelade det till sina fränder.
 Men en kittel, så stor som den Öger önskade, fanns icke i Asgard, och
 man undrade, om en sådan fanns i hela världen. Kitteln kunde visserligen
 beställas hos underjordskonstnärerna;
-\protect\hypertarget{lb1625905.xhtmlux5cux23start47}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start47-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start47-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start47-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start47-d}{}{}
 men Tyr tog sin vän Tor afsides och sade sig kunna ge råd. »Du vet»,
 sade han, »att jag är styfson och fosterson till jätten Hymer, som bor å
 andra sidan Elivågor i yttersta Norden. En kittel så stor som den du
@@ -2048,8 +1620,6 @@ vattnets djup växer hans egen höjd, så att vattnet aldrig når honom
 högre än till starkhetsbältet, fast det händer, att böljorna, om
 sjögången är stark, kunna slå honom upp mot skuldrorna. När han kommit i
 land, återfår hans kropp sin vanliga längd.
-
-\protect\hypertarget{lb1625905.xhtmlux5cux23start48}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start48-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start48-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start48-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start48-d}{}{}
 
 Tor gaf sig denna gången icke tid att stanna och förpläga sig hos Egil.
 Han begaf sig med Tyr öfver Elivågor, sedan han, som vanligt, uppryckt
@@ -2086,7 +1656,6 @@ Där sutto de, när Hymer, sent om kvällen, inträdde i salen. Ispiggar
 skramlade kring honom, och hans kindskägg var fruset. Husfrun hälsade
 honom välkommen från jagten och meddelade den glada nyheten, att sonen
 Tyr, den länge väntade,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start49}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start49-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start49-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start49-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start49-d}{}{}
 kommit på besök. Så till vida var allt godt, men då hon tillade: »med
 honom har Tor, människornas vän, kommit hit», fingo Hymers stygga ögon
 det utseende, som bådade urladdning. Då sade den kloka kvinnan: »se bort
@@ -2117,7 +1686,6 @@ firade ut sina fiskelinor. Hymer hade god fiskelycka och drog på en gång
 upp två hvalar. Tor hade fästat tjurhufvudet på sin krok och fick ett
 väldigt napp. Det var Midgards-ormen, som slukat agnet. Han var redan då
 ett vidunder af förfärande storlek och styrka, ehuru
-\protect\hypertarget{lb1625905.xhtmlux5cux23start50}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start50-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start50-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start50-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start50-d}{}{}
 på långt när icke så stor som han till slut skall bli. Tor halade in
 linan, fast ormen stretade emot, och han fick det fula hufvudet upp mot
 relingen. Hans ena hand höll linan; den andra ryckte hammaren ur
@@ -2149,7 +1717,7 @@ om, att de sprungit ett godt stycke, innan de sågo sig om. Då märkte de,
 att de voro förföljda. En hel jätteskara kom rusande ut ur sina hålor
 och följde Hymer. Då måste Tor lyfta ned kitteln och taga sin hammare.
 Tyr bistod honom manligt, och lyktade striden så, att angriparne
-\protect\hypertarget{lb1625905.xhtmlux5cux23start51}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start51-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start51-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start51-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start51-d}{}{}
+
 stupade. Därefter kommo asarne oantastade öfver Elivågor till Egils
 borg. Här mottogos de med glädje. Tor signade sin slagtade bock med
 hammaren och han stod upp, bockspannet spändes för charen, och med den
@@ -2164,9 +1732,8 @@ fosterbarn i vederlag; något bättre kan jag väl icke ge dig.» Och Tor
 tog Tjalve och Raskva i böter, så nämligen, att han vardt deras
 fosterfader och lät Tjalve få del af sina egna bragders heder.
 
-\paragraph{XVII.}
 
-\paragraph{TORS FÄLTTÅG MOT JÄTTEN GEIRRAUD.}
+\secII{17}{Tors fälttåg mot jätten Geirraud.}
 
 För den, som iakttog tidens tecken, var det tydligt, att jättarne vordo
 med hvarje år, som gick, djärfvare och farligare. Egil med sina alfer
@@ -2181,7 +1748,7 @@ en talrik och stridslysten jättestam och fader till de ryktbara
 jättinnorna Greip och Gjalp. Loke, som, med och utan gudarnes vetskap,
 ej sällan uppsökte sina fränder i Jotunheim och rådgjorde med dem, blef
 ense med Gjalp och Greip om
-\protect\hypertarget{lb1625905.xhtmlux5cux23start52}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start52-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start52-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start52-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start52-d}{}{}
+
 en plan till Egils och hans alfers fördärf och, om möjligt, äfven till
 Tors.
 
@@ -2218,7 +1785,7 @@ Vägen såg till en början lofvande ut, och äfven vädret var drägligt.
 Efter hand ändrade sig detta. Man kom in i en fjälltrakt, som tedde sig
 allt vildare och hemskare, och i samma mån slog vädret om och vardt
 ohyggligt.
-Stormvindar\protect\hypertarget{lb1625905.xhtmlux5cux23start53}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start53-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start53-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start53-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start53-d}{}{}
+Stormvindar
 frambrusade mellan bärgen, svarta molnmassor seglade utefter
 fjällsidorna, och skurar af hagel störtade ned. Och när dalen gjorde en
 krök, sågo Tor och hans kämpar framför sig en älf, i hvilken digra
@@ -2250,7 +1817,7 @@ nyttjade de sina spjut, som de strömledes sköto ned mot den steniga
 bottnen. De flockade sig tillsammans till ömsesidig hjälp, så godt som
 vadställets smalhet tillät det. Främst gick Egil. I midten af de andre
 den hurtige Tjalve. Klangen af spjuten, när deras metallbroddade
-\protect\hypertarget{lb1625905.xhtmlux5cux23start54}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start54-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start54-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start54-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start54-d}{}{}
+
 ändar stötte mot bottenstenarne, blandade sig med dånet af hvirflarne,
 som brusade kring älfvens klippblock.
 
@@ -2282,7 +1849,7 @@ båge klingade; slungstenarne möttes af susande spjut och hvinande pilar.
 Blott några steg, och skarorna drabbade samman bröst mot bröst, och
 öfver vimlet af de stridande lyfte sig och föll i täta slag Tors
 hammare. Det var en hård strid, hvari jättarne
-ådagalade\protect\hypertarget{lb1625905.xhtmlux5cux23start55}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start55-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start55-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start55-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start55-d}{}{}
+ådagalade
 trotsigt mod, och mången alfkämpe fick minnesbetor. Men den slutade med
 Midgardsvännernas seger. Asahammaren krossade hvad den träffade, och
 hvad som efter striden återstod af Geirrauds utsända skara flydde uppåt
@@ -2315,11 +1882,8 @@ Loke, bedragaren, borde råkat illa ut. Men nu, likasom då han ställdes
 till rätta för att han hade narrat Tjalve, visste han att med hal tunga
 och skenfagra ursäkter fria sig från straff.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start56}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start56-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start56-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start56-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start56-d}{}{}
 
-\paragraph{XVIII.}
-
-\paragraph{TORS HAMMARE STULEN.}
+\secII{18}{Tors hammare stulen.}
 
 Tor har haft två hammare. Den som hittills blifvit omtalad är ett godt
 konstvärk, gjordt af hårdaste sten, blankfejadt och skinande och laddadt
@@ -2350,7 +1914,7 @@ Det är sannolikt, att han på förhand visste hvem som stulit hammaren, ty
 han tog raka vägen till jätten Tryms gård. Trym, turshöfdingen, satt på
 sin utkikskulle utanför gården, snodde guldband åt sina hundar och
 kammade sina hästars
-\protect\hypertarget{lb1625905.xhtmlux5cux23start57}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start57-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start57-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start57-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start57-d}{}{}
+
 manar. Loke och han voro gamla bekanta, och Trym begrep i hvilket ärende
 han kom. »Hur står det till hos asar och alfer, och hvarför kommer du nu
 till Jotunheim?» sporde han. »Det står illa till hos asar och alfer»,
@@ -2380,7 +1944,7 @@ sig därtill, och asynjorna klädde honom till brud. Hans blonda skäggfjun
 klipptes bort, hans hår sattes upp efter kvinnobruk och pryddes med band
 och spetsar, man påtog honom en veckrik klädning, vid bältet fästes en
 nyckelknippa, och bröstet pryddes med Fröjas
-Brisingamen\protect\hypertarget{lb1625905.xhtmlux5cux23start58}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start58-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start58-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start58-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start58-d}{}{}.
+Brisingamen
 Tor var ung och vacker och smärt om midjan. En ståtligare brud kunde man
 knappt få se; men väl mycket bred öfver härdarne var den väldiga ungmön.
 Detta var en lek i Lokes smak, och han bad att få följa med, klädd som
@@ -2412,14 +1976,13 @@ Så kom kvällen, och vigseln skulle ega rum. Då befallde Trym,
 jättehöfdingen: »Bären in hammaren Mjölner till brudens vigning och lägg
 den i hennes knä! Vig oss sedan samman med löfte och ed!» Hammaren bars
 in. Då
-\protect\hypertarget{lb1625905.xhtmlux5cux23start59}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start59-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start59-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start59-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start59-d}{}{}
+
 log Tor i sitt hjärta. Den lades i hans knä. Då grep han om den, och
 hvad som sedan skedde behöfver icke sägas. Han drap hammartjufven och
 hela hans slägt. Med Mjölner i brudbältet återvände han till Asgard.
 
-\paragraph{XIX.}
 
-\paragraph{HURU ASGÅRD FICK SIN VALLGÖRDEL OCH ODEN SIN HÄST.}
+\secII{19}{Huru Asgård fick sin vallgördel och Oden sin häst.}
 
 Trym hade velat få Fröja till sig i Jotunheim. Det var många jättar som
 ville det. Men olycklige hade gudar och människor varit, om de urtida
@@ -2448,7 +2011,7 @@ fortsättas af andra händer efteråt.
 vistelse i Asgard.
 
 Första vinterdag började arbetet. Det hvilade hvarken
-\protect\hypertarget{lb1625905.xhtmlux5cux23start60}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start60-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start60-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start60-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start60-d}{}{}
+
 natt eller dag. Om natten drog Svadelfare grus och sten, och asarne
 häpnade öfver de lass han orkade med. Om dagen byggde jätten på vallen,
 och det gick med otrolig raskhet. Asarne började varda ängsliga, att
@@ -2480,15 +2043,14 @@ hästar. Sleipner kan hoppa öfver höga murar, och han är den ende, som
 kan spränga öfver vaferlågor.
 
 Det återstod att i vallen insätta en lämplig port. Den
-\protect\hypertarget{lb1625905.xhtmlux5cux23start61}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start61-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start61-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start61-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start61-d}{}{}
+
 borde varda ett konstvärk af första ordningen, och gudarne ämnade därom
 vidtala underjordssmederna eller Ivaldes söner. Porten var icke färdig,
 när jätten Rungner, såsom sedan skall berättas, kom till Asgard. Men den
 kom snart därefter till stånd och är ett underbart värk.
 
-\paragraph{XX.}
 
-\paragraph{TÄFLINGEN MELLAN URTIDSKONSTNÄRERNA.}
+\secII{20}{Täflingen mellan urtidskonstnärerna.}
 
 Loke utfunderade en plan, som såg mycket förmånlig ut för asarne, men
 skulle draga de största olyckor öfver dem och världen. Valand, Ivaldes
@@ -2513,7 +2075,7 @@ Slutligen lade han järn i ässjan och smidde däraf den yngre Mjölner,
 järnhammaren. Brock skötte blåsbälgen, medan dessa saker tillvärkades,
 och han oroades då hela tiden af en geting, som surrade kring honom och
 stack honom
-\protect\hypertarget{lb1625905.xhtmlux5cux23start62}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start62-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start62-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start62-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start62-d}{}{}
+
 på hand och hals. Värst blef getingen, då järnet var lagdt i ässjan. Då
 stack han Brock mellan ögonen, så att blod rann och han släppte bälgen.
 Däraf fick hammaren det fel, att skaftet vardt något för kort. Getingen
@@ -2548,14 +2110,14 @@ skicklighet för att gifva Asgard världsskyddande konstvärk och sköna
 smycken. Hädanefter skulle förhållandet efter Lokes uträkning varda ett
 helt annat. Alldeles viss var han om att ifall Valand tappade, skulle
 det stå gudarne dyrt. Han
-\protect\hypertarget{lb1625905.xhtmlux5cux23start63}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start63-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start63-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start63-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start63-d}{}{}
+
 hade noga iakttagit denne Ivaldesons skaplynne. Valand var trofast och
 hängifven, så länge hans rättskänsla eller stolthet icke sårats, men
 annars oblidkelig och hänsynslöst hämdgirig.
 
-\paragraph{XXI.}
+\secII{}{XXI.}
 
-\paragraph{JÄRNHAMMAREN PRÖFVAS.}
+\secII{}{JÄRNHAMMAREN PRÖFVAS.}
 
 Oden, iklädd guldhjälm, for ut att profrida Sleipner, den åttafotade
 hästen. Sleipner simmade med ditintills icke sedd snabbhet i lufthafvet.
@@ -2581,7 +2143,7 @@ skola vi fresta», svarade Rungner och hoppade upp på Gullfaxe. Oden
 svängde om åt Asgard till, och det vardt nu en kapplöpning mellan
 Sleipner och Gullfaxe, och så ifrig var Rungner, att han knappast
 märkte, hvar han var, när han, strax bakom Oden, sprängde in i
-\protect\hypertarget{lb1625905.xhtmlux5cux23start64}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start64-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start64-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start64-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start64-d}{}{}
+
 Asgard genom den öppning i borgvallen, som var lämnad för den ännu icke
 insatta porten. Ryttarne häjdade sig utanför Vallhallsdörrarna, och
 Rungner kände nog sin ställning betänklig; men när asarne gingo fram och
@@ -2613,7 +2175,7 @@ beramade mötet. Man väntade, att Tor skulle utvälja någon af de allra
 starkaste asagudarne eller också Egil till sin. Jättarne kommo på den
 tanken, att de mot denne skulle uppställa en gestalt, som genom sin
 oerhörda storlek och sitt förskräckande utseende kunde redan på
-afstånd\protect\hypertarget{lb1625905.xhtmlux5cux23start65}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start65-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start65-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start65-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start65-d}{}{}
+afstånd
 ådraga sig asarnes akt och sänka deras mod. Fördenskull gjorde de af ler
 ett otäckt beläte, som reste sig till en otrolig höjd, och för att gifva
 det själ och lif, insatte de hjärtat af ett sto i dess bröst och sjöngo
@@ -2646,7 +2208,7 @@ hård. Hård som sten var äfven Rungner själf. Så snart de fått godt sigte
 på hvarandra, lyfte Rungner henen och Tor järnhammaren. Båda sigtade
 väl, den ene mot den andres panna. Hammaren och henen möttes med blixt
 och brak, och henen brast i stycken.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start66}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start66-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start66-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start66-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start66-d}{}{}
+
 Ett af styckena for med sådan kraft i hufvudet på Tor, att han föll till
 jorden med hensplinten fastsittande i pannan. Järnhammaren träffade
 Rungner i hufvudskålen, krossade hans hjärna och återvände mellan den å
@@ -2679,7 +2241,7 @@ att han var hemkommen i godt behåll, fast han mist en tå, som nu lyste
 bland himmelens klaraste stjärnor, samt att han snart vore att vänta i
 Trudvang, för att hämta Groa. Då vardt Groa så glad, att hon glömde
 galdersångens fortsättning. Henen
-\protect\hypertarget{lb1625905.xhtmlux5cux23start67}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start67-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start67-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start67-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start67-d}{}{}
+
 är därför kvar i Tors panna, men märkes ej och är ej till vanprydnad.
 
 Att stjärnan kallas Örvandils tå beror därpå, att Egil, såsom redan är
@@ -2693,9 +2255,9 @@ också tycka, att domen, huru den utfölle, vore en betänklig gärning.
 Emellertid inträffade något, som här nedan skall förtäljas och gjorde
 saken än vanskligare.
 
-\paragraph{XXII.}
+\secII{}{XXII.}
 
-\paragraph{MJÖDET I BYRGERS KÄLLA. ODEN HOS FJALAR.}
+\secII{}{MJÖDET I BYRGERS KÄLLA. ODEN HOS FJALAR.}
 
 Det är förut sagdt, att det rena oblandade mjödet i skaparkraftens och
 visdomens källa ursprungligen innehades af Mimer allena. Det är den
@@ -2715,7 +2277,7 @@ Byrger, för att ösa och hemföra dess mjöd.
 Men barnen återkommo icke. Månen hade gått upp, när de voro vid källan,
 och månguden såg dem, när de öste mjödet. Han och Ivalde voro icke
 vänner. Ivalde hade i
-\protect\hypertarget{lb1625905.xhtmlux5cux23start68}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start68-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start68-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start68-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start68-d}{}{}
+
 urtiden bortfört en af mångudens döttrar, Hildegun, och utan hennes
 faders samtycke gift sig med henne.
 
@@ -2751,7 +2313,7 @@ ett bakhåll för den, öfverföll den och röfvade dess mjödförråd. Sin
 vaktpost öfvergaf han och svek därmed den ed han svurit gudarne. Och för
 att mjödet icke återigän skulle falla i deras händer, skyndade han att
 föra det ned i eldjätten Fjalars djupa och mörka
-\protect\hypertarget{lb1625905.xhtmlux5cux23start69}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start69-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start69-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start69-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start69-d}{}{}
+
 dalar och anförtro det åt honom att förvaras i det innersta af hans
 bärgsalar. Det blef öfverenskommet, att Ivalde skulle gifta sig med
 Fjalars dotter Gunnlöd, och att de skulle ega mjödet tillsammans. Ivalde
@@ -2785,7 +2347,7 @@ och ödelägga Midgard. Vakten, som gudarne uppställt vid Hvergelmer, var
 af Ivalde öfvergifven, och Ivalde själf var en väldig kämpe, väl egnad
 att föra Jotunheimsskarorna till kamp. Han var känd som den ypperste af
 alla spjutkämpar, lika ryktbar för den idrotten som
-\protect\hypertarget{lb1625905.xhtmlux5cux23start70}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start70-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start70-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start70-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start70-d}{}{}
+
 hans son Valand för sin smideskonst och hans andre son Egil för sin
 skicklighet som bågskytt och skidlöpare.
 
@@ -2822,7 +2384,7 @@ Sedan skreds till vigseln, och på den heliga ringen svuro Oden och
 Gunnlöd hvarandra trohetens ed.
 
 Den glada fästen fortsattes, och hornen fylldes flitigt,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start71}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start71-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start71-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start71-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start71-d}{}{}
+
 isynnerhet brudgummens. Ivalde var känd ej allena som den ypperste
 spjutkämpen, utan ock som en dryckeskämpe, jämngod med Rungner och i den
 idrotten kommande närmast Tor. Däraf hade han ock fått till binamn
@@ -2857,7 +2419,7 @@ eldborr öppnat, ur Fjalars skumma värld genom ljusa rymder till det
 skimrande Asgard.
 
 Men Gunnlöd, den goda kvinnan, satt där nere och grät
-\protect\hypertarget{lb1625905.xhtmlux5cux23start72}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start72-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start72-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start72-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start72-d}{}{}
+
 öfver sin fallne broder och öfver förlusten af den make hon gifvit sitt
 trogna hjärta.
 
@@ -2880,9 +2442,9 @@ strömmade där emot honom. Dit skyndade han nu, men föll i ett af dvärgen
 lagdt försåt och vardt aldrig synlig mer. Några säga, att han krossades
 under stenblock, som nedvräktes från bärget.
 
-\paragraph{XXIII.}
+\secII{}{XXIII.}
 
-\paragraph{DOMEN ÖFVER VALANDS KONSTVÄRK.}
+\secII{}{DOMEN ÖFVER VALANDS KONSTVÄRK.}
 
 Dagen var nu inne, då gudarne skulle afkunna dom i målet mellan Sindre
 och Loke. Den egentliga frågan var den, om Loke tappat vadet och
@@ -2895,7 +2457,7 @@ undergång.
 
 Domen måste stödja sig på en oväldig och sakkunnig jämförelse mellan
 Sindres konstvärk och Valands. Vore
-Valands\protect\hypertarget{lb1625905.xhtmlux5cux23start73}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start73-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start73-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start73-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start73-d}{}{}
+Valands
 bättre än Sindres, så hade Loke vunnit vadet; i motsatt fall hade han
 tappat det.
 
@@ -2929,7 +2491,7 @@ konstvärk Sindres värktyg voro, att sylen på kallelse kom genast från
 hans underjordssmedja till Asgard och stannade i Brocks hand. Brock
 hopsydde Lokes läppar och gick bort, föga glad åt ärendets utgång. Lokes
 läppar vordo snart åter fria; men ärren efter Sindres
-\protect\hypertarget{lb1625905.xhtmlux5cux23start74}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start74-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start74-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start74-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start74-d}{}{}
+
 syl gingo aldrig bort. Munnen fick det fula utseende, som anstår en
 försmädares, och Lokes fagra utseende var från den dagen skämdt.
 
@@ -2940,9 +2502,9 @@ och han ansåg, att domen skulle hafva farliga följder, ty Valands lynne
 och Valands krafter kände han från den tid, när denne gjorde sina
 lärospån i Sindres smedja.
 
-\paragraph{XXIV.}
+\secII{}{XXIV.}
 
-\paragraph{FÖRSÖKEN ATT FÖRSONA VALAND. IVALDESÖNERNAS FLYKT.}
+\secII{}{FÖRSÖKEN ATT FÖRSONA VALAND. IVALDESÖNERNAS FLYKT.}
 
 Fröj vistades hos sin fosterfader Valand, när de båda underrättelserna
 kommo till Ivaldesönerna, att Oden vållat deras faders död och att
@@ -2963,7 +2525,7 @@ Gudarne började öfvertänka, att Ivaldes söner hade skäl till missnöje
 med dem. Njord, hvars son var i Valands vård och våld, blef orolig. Han
 samrådde med Oden om hvad borde göras, och de fattade det beslut, att
 Valand skulle hedras
-\protect\hypertarget{lb1625905.xhtmlux5cux23start75}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start75-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start75-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start75-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start75-d}{}{}
+
 med ett till gudarne knutet slägtskapsband. Njord skulle begära hans
 dotter Skade till äkta, och Skade upphöjas till asynja. På detta sätt
 ville gudarne godtgöra den dom som blifvit fälld öfver Valands smiden,
@@ -2997,7 +2559,7 @@ för hvars skull han måste vandra så här och svälta, önskade han i alla
 onda vättars våld. Så kom man till en dalöppning. Därifrån hördes
 klangen af en pingla, en sådan som skällkor och lockrenar bära. När
 vandrarne
-\protect\hypertarget{lb1625905.xhtmlux5cux23start76}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start76-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start76-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start76-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start76-d}{}{}
+
 kommo in i dalen, sågo de det behagliga stället vid källan och ej långt
 därifrån en betande renhjord. Pinglan, som klingat angenämt i deras
 öron, bars af en fet renoxe, som gick där strax bredvid. Det var en af
@@ -3030,7 +2592,7 @@ icke bort fjäderskruden, såsom väl Oden väntat. Loke gjorde delningen,
 men torde varit harmsen öfver att han, som fått värdigheten af asagud,
 skulle betjena en, som endast hade alfbörd. Då Loke delat, tog Valand
 alla fyra delarna och
-\protect\hypertarget{lb1625905.xhtmlux5cux23start77}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start77-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start77-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start77-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start77-d}{}{}
+
 flög upp i trädets nedersta gren, där han i de hungrande asarnes åsyn åt
 med örnens stolta later och glupska matlust. Han hade i själfva värket
 ingenting förtärt alltsedan han erfor sin faders död och den smädliga
@@ -3063,7 +2625,7 @@ Loke försäkrade att vid första läglighet skulle eden uppfyllas.
 
 Det förmäles icke hvad han efter sin återkomst till Oden och Höner hade
 att förtälja. Men var han sig den gången
-\protect\hypertarget{lb1625905.xhtmlux5cux23start78}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start78-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start78-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start78-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start78-d}{}{}
+
 lik, sökte han nog intala dem, att han frivilligt höll i stören och hade
 haft en svår dust med Valand och slutligen lyckats drifva honom på
 flygten.
@@ -3096,7 +2658,7 @@ själfve, I orättfärdige domare, I oduglige gudar!» svarade Valand. --
 »Hvarje ord är här spildt», ropade Had; »vapnen måste tala. I förrädiske
 söner af Ivalde, vågen I hålla stånd och strida?» Då trädde Egil fram
 och utmanade Njord. »Du lågättade,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start79}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start79-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start79-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start79-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start79-d}{}{}
+
 du träl!» ropade Had; »vågar du utmana en af Asgards yppersta?» Had grep
 sin båge, lade pil på strängen och sigtade på Egil. Men denne hade
 kommit honom i förväg. Ryktbara äro Egils tre pilar, smidda af honom med
@@ -3118,9 +2680,9 @@ hånas som lågättad.»
 
 De begåfvo sig in i Jotunheim.
 
-\paragraph{XXV.}
+\secII{}{XXV.}
 
-\paragraph{DEN FÖRSTE FIMBULVINTERN. BARNEN I ODÖDLIGHETSÄNGDEN. VALANDS
+\secII{}{DEN FÖRSTE FIMBULVINTERN. BARNEN I ODÖDLIGHETSÄNGDEN. VALANDS
 HÄMDESVÄRD.}
 
 Efter Ivaldesönernas ankomst till Jotunheim började den förste
@@ -3130,7 +2692,7 @@ jordskifvans rand och invid Amsvartners haf, öfver hvilket evigt mörker
 rufvar, ligger ett land, till hvilket Ivaldesönerna ställde sin kosa.
 Mellan isjökeltäckta fjäll draga sig dalar, bevuxna med träd af det
 slag, som trifves i den ryktbara Järnskogens mörker och köld.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start80}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start80-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start80-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start80-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start80-d}{}{}
+
 Svarta afgrunder gapa med okändt djup. I en af dem är en hålväg, som
 leder ned till Nifelheim i underjorden.
 
@@ -3167,7 +2729,7 @@ yrsel de nio jättekvinnorna, som kringvrida världskvarnen och
 stjärnehimmelen. Två starka tursmöar, Fenja och Menja, sällade sig till
 dem och satte kvarnen i en rasande fart, så att jordens alla djup
 bäfvade. Ur
-kvarnstenen\protect\hypertarget{lb1625905.xhtmlux5cux23start81}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start81-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start81-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start81-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start81-d}{}{}
+kvarnstenen
 sprungo klippstycken, som kastades högt upp ur hafvet, jordens bärg
 sprutade eld och rök, kvarnens resvärk rubbades och stjärnehimmelen fick
 den sneda ställning han allt sedan innehar.
@@ -3203,7 +2765,7 @@ sammanträdde på sin tingstad och öfverlade om hvem som förrådt henne åt
 jättarne. De upptäckte den brottsliga. Det var en jättemö, som Fröja
 upptagit i sin hofstat, och de gjorde än en upptäckt: att den förrädiska
 jättemön var den pånyttfödda Gullveig. Tor slog henne då med
-\protect\hypertarget{lb1625905.xhtmlux5cux23start82}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start82-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start82-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start82-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start82-d}{}{}
+
 sin hammare till döds; häxans lik hölls än en gång öfver lågorna. Men än
 en gång hände, att hennes hjärta endast blef halfsvedt, och att Loke,
 letande efter det i askan, fann och slukade det. Han födde därefter till
@@ -3239,7 +2801,7 @@ sin galdersång söder-ut, mättad med snömoln och hagel.
 
 Valand hade af guld smidt en armring, liknande den af Sindre smidde
 ringen Draupner däruti, att andra ringar, ehuru
-\protect\hypertarget{lb1625905.xhtmlux5cux23start83}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start83-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start83-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start83-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start83-d}{}{}
+
 ej så många, droppade ut ur honom. Ur Valands kom en ring hvarje vecka.
 Äfven de ringarne voro trollredskap och hade formen af ormar. För hvarje
 på repet upplöst knut knöt Valand dit en ormring. På detta sätt talde
@@ -3273,14 +2835,14 @@ den med en mur och satte in i muren en port, lika konstrik som
 Asgardsporten. Inom den muren komma aldrig sorg och lidanden, aldrig
 lyte och sjukdom, aldrig ålderdom och död. Salen heter Breidablik.
 Delling,
-morgonrodnadsalfen\protect\hypertarget{lb1625905.xhtmlux5cux23start84}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start84-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start84-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start84-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start84-d}{}{},
+morgonrodnadsalfen,
 är dess väktare. Barnen därinne näras med den kraftförlänande
 honungsdagg, som faller från Yggdrasils nedersta löfhvalf i Mimers och
 Urds dalar.
 
-\paragraph{XXVI.}
+\secII{}{XXVI.}
 
-\paragraph{BALDERS DÖD.}
+\secII{}{BALDERS DÖD.}
 
 Stora voro de förluster Asgard lidit och stora de faror, som hotade
 lifvet i Midgard, sedan Fröj och Fröja, Idun och de andra
@@ -3306,7 +2868,7 @@ en tillrättavisning, tog pojken Draupners frejdade smed i håret och drog
 honom på det sättet ut öfver tröskeln; vid ett annat tillfälle, när han
 tillsades att smida och icke ville det, slog han med släggan ett sådant
 slag i städet, att det flög i flisor. Men Mimers visdom lyckades
-\protect\hypertarget{lb1625905.xhtmlux5cux23start85}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start85-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start85-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start85-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start85-d}{}{}
+
 efter hand tämja hans uppbrusande lynne, om än icke läka hans
 obetänksamhet, och när fosterfadern återsändt honom till Asgard som en
 fager, höfvisk och i många idrotter skicklig yngling, fick Oden honom
@@ -3341,7 +2903,7 @@ sig till gudarnes fiender där, för att, kämpande i deras led, söka
 infria sitt löfte.
 
 Så bar han då till någon tid vapen mot sina egna fränder,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start86}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start86-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start86-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start86-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start86-d}{}{}
+
 emedan han gjort löftet att taga Nanna med våld från Balder. Men Balder
 besegrade honom med vapen först, men med godhet sist och fullkomligast.
 Han återförde sin broder till Asgard, förlät, urskuldade och tröstade
@@ -3377,7 +2939,7 @@ tillförsäkrades trygghet genom en ed, som uttalades af alla himmelens
 stjärnor och upprepades af luftens, hafvets och jordens innebyggare, af
 alla bärg och dalar, af alla skogar och öknar, en ed, som genljöd från
 Urds och Mimers
-\protect\hypertarget{lb1625905.xhtmlux5cux23start87}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start87-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start87-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start87-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start87-d}{}{}
+
 riken, ja från Jotunheim, där jättarne sade sig vara alla gudars
 fiender, blott icke Balders; ja från själfva Nifelheim, där äfven
 farsoternas och sjukdomarnes andar med bleka läppar uttalade
@@ -3413,7 +2975,7 @@ tala, brusto de i gråt. Asafadern hade mist sin älskling,
 världsordningen underpanten för sitt bestånd, godheten sin förespråkare.
 
 Så djupt nu asafadern grämdes af sin egen förlust, sörjde
-\protect\hypertarget{lb1625905.xhtmlux5cux23start88}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start88-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start88-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start88-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start88-d}{}{}
+
 han dock, såsom världens styresman anstod, än mer öfver världens. Han
 sadlade Sleipner och red ned i underjorden till Mimer och besvor honom
 att säga hvad han visste. Skulle med Balder världen gå sin eviga
@@ -3447,7 +3009,7 @@ var färdigt och den heliga elden gniden till vedens antändning och bålet
 signadt med Tors hammare, drog Oden från sin arm ringen Draupner och
 lade den på Balders bröst. Man såg, att han lutade sig ned och hviskade
 i den dödes öra.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start89}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start89-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start89-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start89-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start89-d}{}{}
+
 Hvad han då sade har han aldrig omtalat för gudar eller människor. Det
 blåste en stark nordanvind från Järnskogen: en af dessa vindar, som
 Valand lösgjort och som i Midgard kom med köld och hagel. Bålet tändes,
@@ -3482,7 +3044,7 @@ I Asgard voro alla öfvertygade om att Had icke hade velat sin broders
 död, och ingen sörjde djupare än han det skedda. Skulle den i sitt
 uppsåt oskyldige Had dräpas, blod af asafaderns blod än en gång utgjutas
 och den ene sonens död medföra den andres? Ingen kunde råda till
-\protect\hypertarget{lb1625905.xhtmlux5cux23start90}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start90-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start90-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start90-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start90-d}{}{}
+
 detta, ingen ville lyfta sin hand mot Had. Men ej en gång gudarne äro i
 stånd att genomskåda hvarandras innersta bevekelsegrunder. I denna,
 såsom i alla liknande saker, var det deras domareplikt att icke blunda
@@ -3517,7 +3079,7 @@ själf, af Gullveigs säjdkonst och förbjudna runor. Detta gjorde
 asafadern -- nyttjande, när framgång ej annorlunda kunde vinnas, ett
 tadelvärdt medel att komma till ett af rättvisan och ödet fordradt mål.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start91}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start91-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start91-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start91-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start91-d}{}{}
+
 
 Rind födde med Oden en son, som kallas Vale. Hon födde honom tidigt, ty
 han slet otåligt i de band, som fängslade honom under modershjärtat, och
@@ -3526,9 +3088,9 @@ fällde Had. Den döde Had steg ned till underjorden. Balder emottog honom
 där. De lefva där nere tillsammans, och då världsförnyelsens dag kommer,
 skola de tillsammans återvända och tillsammans bo på Valhalls tomter.
 
-\paragraph{XXVII.}
+\secII{}{XXVII.}
 
-\paragraph{FIMBULVINTERNS HÖJDPUNKT. FOLKUTVANDRINGEN FRÅN NORDEN.
+\secII{}{FIMBULVINTERNS HÖJDPUNKT. FOLKUTVANDRINGEN FRÅN NORDEN.
 SKÖLD-BORGAR OCH HALFDAN.}
 
 Efter Balders död fanns det i Asgard ingen makt, som kunde häjda de af
@@ -3550,7 +3112,7 @@ Aurvangalandet, bodde nu många folkstammar, komna från Ask och Embla,
 alla talande samma tungomål och följande samma sedvänjor. Söder om
 svearne och nedemot Järavallarne, som utgöra Aurvangalandets södra kust,
 bodde goter, daner, heruler, gepider, viniler (longobarder), angler,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start92}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start92-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start92-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start92-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start92-d}{}{}
+
 saksare, tyringar, vandaler och andra stammar. Dit intills hade de alla
 lefvat i endrägt och ansett sig för hvad de voro: grenar på ett och
 samma folkträd. Så långt som de utbredt sig öfver Norden, hade landet
@@ -3585,7 +3147,7 @@ fimbulvinterns inbrott och begynnelsen till en järnålder, hvarom han
 hört en förutsägelse vid sin sons födelse. Sonen hette Halfdan och var
 nu en yngling; Sköld-Borgars maka, Halfdans moder, hette Drott.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start93}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start93-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start93-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start93-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start93-d}{}{}
+
 
 Om Halfdans födelse förtäljes, att den natt, då han kom till världen,
 rådde stark storm. »Heliga vatten nedstörtade från himmelsfjällen»
@@ -3619,7 +3181,7 @@ sågo den nyfödde. Framsynta som korpar äro, förekom det dem som om
 gossen redan stod vapenrustad. »Ser du», sade den ene korpen till den
 andre, »han är blott en dag gammal, denne gudaättling, och ändå ser jag
 honom skrudad i brynja. Nu är fredens ålder slut;
-\protect\hypertarget{lb1625905.xhtmlux5cux23start94}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start94-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start94-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start94-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start94-d}{}{}
+
 nu är vår tid inne. Vi och ulfvarne ha länge hungrat, men ser du, hur
 hvassa ögon den gossen har! Ja, vår tid har kommit. Vi skola trifvas.»
 
@@ -3653,7 +3215,7 @@ var för alltid flyktad från Midgard. Den världsålder, som kallas
 »stormtid och ulftid, yxtid och kniftid», hade inbrutit, och den skall
 fortgå till Bagnarök.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start95}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start95-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start95-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start95-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start95-d}{}{}
+
 
 Halfdan förde med skicklighet alla slags vapen. Men hans älsklingsvapen
 var klubban. Svärdet hade under fridsåldern varit obekant. De första
@@ -3687,7 +3249,7 @@ och Halfdan till en strid, som lyktades så, att Halfdan fällde honom med
 en klubba, på hvars skaft en guldkula var fästad. Växtlighetsdisernas
 fader kunde ej falla för annat vapen än ett, som liknade solen. Halfdan
 förde Groa till Sköld-Borgars gård.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start96}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start96-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start96-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start96-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start96-d}{}{}
+
 Där födde hon en son, som ej var Halfdans, utan Egils. Sonen kallades
 Od-Svipdag. Ett år därefter födde hon med Halfdan en son, som fick
 namnet Gudhorm. Hon kände sig dock alltid som en främling i Halfdans
@@ -3720,7 +3282,7 @@ längden vore gagnlöst, så länge fimbulvinterns makter rasade bakom de
 nordligare stammarne och nödgade dem att tränga på. De hade ju att välja
 detta eller hungersdöden. Och enär alla dessa stammar voro fränder och
 ledde sin härkomst från
-Aurvangalandet\protect\hypertarget{lb1625905.xhtmlux5cux23start97}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start97-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start97-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start97-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start97-d}{}{},
+Aurvangalandet,
 ville Sköld-Borgar icke se dem förstöra hvarandra i brödrafäjd.
 Fördenskull beslöt han med sitt folk tåga söderut, äfven han. Så skedde,
 och många stammar förenade sig under honom, för att å andra sidan det
@@ -3741,9 +3303,9 @@ det gällde, om den skulle hålla, eller om människoslägtets urhem och
 fädernas heliga grafvar skulle för alltid stanna i frostmakters och
 gudafienders våld.
 
-\paragraph{XXVIII.}
+\secII{}{XXVIII.}
 
-\paragraph{VALANDS SENARE ÖDEN OCH DÖD.}
+\secII{}{VALANDS SENARE ÖDEN OCH DÖD.}
 
 Sju vintrar hade svanemöarna Idun, Sif och Auda tillbragt i Ulfdalarne.
 I den åttonde vintern blefvo de sjuka af längtan efter solglans,
@@ -3755,7 +3317,7 @@ och Elivågor.
 Då vardt det tungt äfven för bröderna att stanna. Men Valand hade för
 stora mål i sigte, för att längtan och sorg skulle kunnat afvända honom
 från dem; han var ej allenast
-\protect\hypertarget{lb1625905.xhtmlux5cux23start98}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start98-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start98-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start98-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start98-d}{}{}
+
 oläkligt hämdgirig, utan också ihärdig och tålmodig utan like. Till
 bröderna sade han: »Då I längten härifrån, så är det bättre för eder att
 gå.» De togo sina skidor och bågar och gingo på olika vägar åt söder.
@@ -3790,7 +3352,7 @@ hjälmar, brynjor och vapen; men det var blott som om månen lekt med en
 dimma. De kommo sent om kvällen till Valands smedja och stannade vid
 dess gafvel. Töcknet lägrade sig där.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start99}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start99-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start99-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start99-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start99-d}{}{}
+
 
 Dörren stod öppen, och i smedjan sågs ingen. Mimer och hans söner stego
 ur sadeln och gingo in. Med kännares ögon betraktade de Valands
@@ -3825,7 +3387,7 @@ Men tröttheten öfverväldigade honom. Hufvudet, som hvälfde de
 världsfördärfliga planerna, sjönk ned emot sitt bröst. Valand sof.
 
 Han vaknade, men ej till glädje. Lindbastrepet, hvari
-\protect\hypertarget{lb1625905.xhtmlux5cux23start100}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start100-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start100-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start100-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start100-d}{}{}
+
 han bundit stormarne, var nu bundet kring stormutsändaren själf.
 Trollredskapet slingrade sig kring hans armar och ben och var en fastare
 boja än någon af järn. Framför honom stod Mimer och hade hämdesvärdet i
@@ -3861,7 +3423,7 @@ underjordssmederna, stundom foro öfver till holmen, samspråkade med
 Valand och beskådade hans händers värk. De dolde icke sin beundran öfver
 dem. Sindre, den store konstnären, hade aldrig hyst afund till Valand,
 ehuru han
-\protect\hypertarget{lb1625905.xhtmlux5cux23start101}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start101-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start101-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start101-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start101-d}{}{}
+
 icke ville anses för sämre smed. Han hade undersökt hämdesvärdet och
 förklarat, att det var det yppersta smide i hela världen, märkvärdigare
 än hammaren Mjölner, och att han själf skulle behöfva lika lång tid som
@@ -3895,7 +3457,7 @@ vackraste saker af guld. Valands ögon lyste styggt, medan piltarne
 fröjdade sig med åsynen af skatterna. Han sade till dem: »Kommen hit i
 morgon bittida, när ingen ser er; då skall jag skänka er af klenoderna.
 Men låt ingen veta att I varit hos mig.»
-\protect\hypertarget{lb1625905.xhtmlux5cux23start102}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start102-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start102-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start102-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start102-d}{}{}
+
 Följande morgon kommo de åter till smedjan; men rodde icke tillbaka.
 Valand kröp till holmens strand och gaf den tomma båten en stöt, så att
 den for ut i sjön. De saknade barnen efterletades, men anträffades
@@ -3930,7 +3492,7 @@ ur deras slappnade händer. Det var nu den plan, som Valand uppgjort.
 Från underjorden kom bud till asarne, att Valand flytt och att nya faror
 förestode. Asarne rådgjorde. De sade hvarandra, att de själfva vållat
 det hat Valand till dem hyste,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start103}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start103-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start103-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start103-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start103-d}{}{}
+
 och att det vore bättre att försona sig med honom och Ivaldeslägten än
 att utrota dem, ifall valet stode gudarne fritt. Det var dem framför
 allt af vigt, att Idun återkomme till Asgard. Måhända kunde Valand, om
@@ -3962,7 +3524,7 @@ vaferlågorna tändes, gudaspjuten susade i luften, Valand kom i ohäjdlig
 fart, stormade, spjutsårad, genom vaferlågornas hvirflar och föll med
 brinnande vingar ned vid vallen. Örnhammen sjönk tillsammans i rök och
 gnistor, och
-\protect\hypertarget{lb1625905.xhtmlux5cux23start104}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start104-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start104-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start104-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start104-d}{}{}
+
 gudarne sågo Valand själf. Han sökte resa sig på sina förlamade ben, för
 att kämpa intill döden. Tor slungade Mjölner mot hans panna, och död låg
 den väldige med krossadt hufvud.
@@ -3971,9 +3533,9 @@ Sindres hammare, som han skulle öfverträffa, hade blifvit hans bane.
 Fimbulvinterns upphofsman var icke mer, och Idun hade återkommit till
 Asgard.
 
-\paragraph{XXIX.}
+\secII{}{XXIX.}
 
-\paragraph{OD-SVIPDAG OCH FRÖJA.}
+\secII{}{OD-SVIPDAG OCH FRÖJA.}
 
 Egil och hans son Ull hade haft åtskilliga äfventyr på sin färd från
 Ulfdalarne, men kommo dock oskadde fram till Svitiod det stora och
@@ -3998,7 +3560,7 @@ för snarfyndighet och kvickhet i tal och svar.
 Sif hvälfde många tankar. Växtlighetsdisen sörjde öfver den förstörelse,
 som genom Valand öfvergick världen, och hon märkte, huru Egil rufvade på
 sin brutna ed och på det
-\protect\hypertarget{lb1625905.xhtmlux5cux23start105}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start105-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start105-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start105-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start105-d}{}{}
+
 med gudarne slitna vänskapsbandet. Sif var framsynt och sierska till
 skaplynnet, och det är väl också troligt, att Urd gaf henne ingifvelser
 och ledde hennes beslut.
@@ -4033,7 +3595,7 @@ drabbat mitt barn? Till hvilken olycka är du född, då du kallar på din
 moder, som farit ur de lefvandes värld?» Svipdag svarade: »Hon, som
 efter dig famnade min fader, har illslugt ålagt mig att söka ett
 oupphinneligt mål.» Men rösten från grafven uppmanade
-\protect\hypertarget{lb1625905.xhtmlux5cux23start106}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start106-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start106-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start106-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start106-d}{}{}
+
 honom att icke tveka. »Bidar du själf en gynnsam utgång, skall nog
 nornan leda dig på rätt stråt.» »Sjung då», bad Svipdag, »goda galder
 öfver din son!» Och Groa sjöng, att Urd skall upprätthålla honom, då han
@@ -4068,7 +3630,7 @@ vän blir mindre än han.»
 
 Bröderna sade hemmet farväl och vandrade norrut till Elivågor. Där sågo
 de sin faders öfvergifna borg, där Tor
-\protect\hypertarget{lb1625905.xhtmlux5cux23start107}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start107-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start107-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start107-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start107-d}{}{}
+
 så mången gång gästat honom. De gingo öfver Elivågor och följde utefter
 Jotunheimskusten. Där de funno jättegårdar, sökte de natthärbärge och
 emottogos väl, emedan de voro Valands brorsöner. Bland alla jättar
@@ -4104,7 +3666,7 @@ Svipdag att förkorta vägen till borgen med en täflan i nidvisor och
 hemställde, om ej segraren borde taga den öfvervunnes hufvud som
 segerpris. Den kvicke Svipdag gjorde jätten snart svarslös, och denne
 rusade
-förbittrad\protect\hypertarget{lb1625905.xhtmlux5cux23start108}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start108-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start108-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start108-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start108-d}{}{}
+förbittrad
 före dem till jättehöfdingens sal och skrek, att detta var gäster, som
 borde mista lifvet. När Svipdag och Ull inträdde i salen -- Svipdag
 främst, Ull bakom honom -- hälsades de af de innevarande välkomna med
@@ -4140,7 +3702,7 @@ Om de dagar alfbröderna tillbragte i detta lag kan i korthet sägas, att
 de önskat dem vara färre. Från morgon till afton vilda dryckeslag,
 ohöfviska sånger uppstämda af skällande och tjutande röster, öfverfall,
 slagsmål och dråp.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start109}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start109-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start109-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start109-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start109-d}{}{}
+
 Jättarne hade tydligen föresatt sig, att Svipdag och Ull icke skulle
 komma lefvande därifrån. Den älste Grepp, som tyckt sig finna, att den
 tysta Fröjas blick ofta hvilade på Svipdag, blef svartsjuk och sökte
@@ -4173,7 +3735,7 @@ långa fångenskap hos de uslaste af Ymers afkomma och hans oförmåga under
 denna tid att hjälpa människorna, som trott på hans makt och blotat till
 honom, hade höljt honom med så mycken skymf och vanära, att han fann det
 bättre att stanna där han var. Svipdag frågade, om han
-\protect\hypertarget{lb1625905.xhtmlux5cux23start110}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start110-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start110-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start110-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start110-d}{}{}
+
 glömt, att han hade en fader, som sörjde hans förlust, och oaflåtligt,
 under svåra faror, efterletade honom. Då brast Fröj i gråt, men
 upprepade, att han icke skulle följa Svipdag. Men han ville gifva
@@ -4208,7 +3770,7 @@ kommo till ett glad (öppen plats i skogen), begränsadt på en sida af ett
 lodrätt bärg. Mot en dörr i detta gick en skara getter med klingande
 skällor, och bakom dem två kvinnor, den ena en jättinna, den andra klädd
 som getpiga.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start111}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start111-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start111-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start111-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start111-d}{}{}
+
 När hjorden drifvits in, öppnade jättinnan en annan dörr, och
 vinterkvällsolens röda sken föll in därigenom och belyste hennes sal.
 Bröderna gingo fram och bådo om natthärbärge. Hon mottog dem vänligt,
@@ -4241,7 +3803,7 @@ Hon skulle följande morgon begifva sig ut och bjuda dem. Vigseln skulle
 ske i all enkelhet, och endast de aderton närmaste jättefamiljerna
 inbjudas.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start112}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start112-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start112-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start112-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start112-d}{}{}
+
 
 Långt innan följande morgons sol uppgått, hade gårdens egarinna färdats
 ut i bröllopsbjudnings-ärende. Svipdag och Ull hade knappt sett henne
@@ -4276,7 +3838,7 @@ visste man i Asgard, att Fröja var genom Svipdag frälsad ur jättevåld.
 Hon hämtades till den glänsande gudaborgen däruppe, och stor var
 asafaderns och alla gudars och gudinnors glädje öfver hennes återkomst.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start113}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start113-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start113-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start113-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start113-d}{}{}
+
 
 Sif och Skade togo åter svaneham och flögo mot norr. De kände nu genom
 Svipdag, hvar borgen låg, där Fröj var på samma gång höfding och fånge.
@@ -4298,9 +3860,9 @@ Idun, Fröja och Fröj voro återvunna åt gudarne. Växtlighetsdiserna
 visade sig åter som deras vänner. Valand, den förfärlige, var dräpt och
 fimbulvinterns makt därmed bruten.
 
-\paragraph{XXX.}
+\secII{}{XXX.}
 
-\paragraph{HALFDANS TÅG MOT NORDEN. EGILS DÖD.}
+\secII{}{HALFDANS TÅG MOT NORDEN. EGILS DÖD.}
 
 Nu kommo öfver Midgard år som voro löftesrika för lif och blomstring.
 Isfälten, som betäckte den stora nordiska ön, smälte under solens varma
@@ -4311,7 +3873,7 @@ vordo till åar och älfvar, hvilka mällan grönskimrande isväggar brusade
 hän till hafvet. Mer och mer drogo sig isfälten tillbaka. För hvarje år
 visade sig grönskan något tidigare i dalarne och räckte något längre.
 Vintern började närma sig
-\protect\hypertarget{lb1625905.xhtmlux5cux23start114}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start114-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start114-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start114-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start114-d}{}{}
+
 lagstadgade gränser och nöja sig med de månskiften, som ursprungligen
 blifvit tilldelade den. Trädslag, som under fimbulvintern blifvit
 förkrympta till buskar eller till refvor, som kröpo under snön utefter
@@ -4344,7 +3906,7 @@ hildingar och budlungar. Kampen vardt hård, och vikande för öfvermakten,
 måste svearne öfvergifva Aurvangalandet och draga nordligare. Med
 förvåning märkte de, att deras återtåg följdes af vår och blomster och
 flyttfågelskaror. Isfälten veko allt efter som de tågade mot norr.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start115}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start115-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start115-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start115-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start115-d}{}{}
+
 Framför dem i fjärran drogo moln, som sände ljungeldar ned mot de
 smältande isjöklarne. Det var Tor, som åskade där och gjorde det
 obehagligt för därvarande invandrare från Jotunheim att kvarstanna i det
@@ -4377,7 +3939,7 @@ kunna onda tungor få ett skenskäl att säga, att han en gång varit rädd.
 Fördenskull gick nu Hildeger fram ur svearnes led. Tvekampen mällan dem
 fördes med svärd, och hafva våra fäder sagt, att Valands uppfinning,
 svärdet, åtminstone i dess första tider, sällan drogs
-\protect\hypertarget{lb1625905.xhtmlux5cux23start116}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start116-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start116-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start116-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start116-d}{}{}
+
 utan att vålla frändedråp. Hildeger föll, efter skiftade hugg, dödligt
 sårad. Då lät han Halfdan veta hvem han var. »Mig födde Drott i Svitiod;
 dig bland danerna. Förlåt, att jag icke sade dig, hvem jag är. Vi ha
@@ -4410,7 +3972,7 @@ hunnit lägga pil till bågsträng, innan han föll under Halfdans klubba.
 Svipdag och andra där inne räddade sig med flykten.
 
 Följande dag stod slaget vid Svarins hög. Här föllo
-\protect\hypertarget{lb1625905.xhtmlux5cux23start117}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start117-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start117-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start117-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start117-d}{}{}
+
 många å ömse sidor, och bland de fallne voro alfkämpar, som en gång
 hängde med Tjalve vid Tors starkhetsbälte, då han vadade genom Elivågor.
 Slaget ändade så, att svearne ändtligen bekvämde sig att emottaga fred.
@@ -4445,15 +4007,15 @@ att hon vid soluppgången sjönk i hafvet, men vid solnedgången dök upp
 igen. Tjalve bar gnideld kring ön och gjorde henne därmed fast. De
 nybyggare, som följde honom dit, voro af den gotiska stammen. Goter var
 det
-\protect\hypertarget{lb1625905.xhtmlux5cux23start118}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start118-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start118-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start118-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start118-d}{}{}
+
 också, som bosatte sig i Götaland, söder om svearne, och på den halfö,
 som sedan kallats Jutland. Hela detta rike fick namnet Reidgotaland. På
 de bördiga öarna utanför Aurvangaland byggde danerna och söder om dem
 anglerna, saksarne och många andra befryndade folk.
 
-\paragraph{XXXI.}
+\secII{}{XXXI.}
 
-\paragraph{SVIPDAG HÄMTAR HÄMDESVÄRDET. HALFDANS DÖD.}
+\secII{}{SVIPDAG HÄMTAR HÄMDESVÄRDET. HALFDANS DÖD.}
 
 De band, med hvilka Halfdan låtit binda Svipdag, höllo icke mot den
 galdersång, som Groa hade sjungit öfver sin son. Svipdag andades på dem,
@@ -4484,13 +4046,13 @@ hoppas, att Sinmara utlämnar svärdet?»
 
 »Hon utlämnar det åt ingen, som ej medför och lägger i hennes hand den
 blanka skära, hvarmed hon kan afskära
-\protect\hypertarget{lb1625905.xhtmlux5cux23start119}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start119-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start119-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start119-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start119-d}{}{}
+
 en af Urd tvinnad tråd. Skärans egg biter, när Urd tillåter det.»
 
 »Hur skall jag finna den skäran?»
 
 »Bland hanen Vidofners
-nystkotor»{\protect\hyperlink{lb1625905.xhtmlux5cux23n2}{2}}. Just som
+nystkotor». Just som
 månguden sagt detta, blänkte det till i luften, och en silfverhvit skära
 nedföll vid Svipdags fötter. Svipdag stack den i sitt bälte och tackade
 månguden.
@@ -4520,7 +4082,7 @@ klädd i det slags kappa, hvilken gör sin bärare osynlig för vanliga
 bäraren, men icke hans skugga. Svipdag kastade sitt spjut mot den punkt
 på snön, där han dömde, att väktarens ena fot måste vara, och spjutet
 fastnade också i den osynliges häl.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start120}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start120-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start120-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start120-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start120-d}{}{}
+
 Då sprang Svipdag fram och grep honom, afryckte kappan och såg honom nu
 för sina ögon. De brottades. Svipdag segrade och aftvang den öfvervunne
 en ed, att han finge ostörd gå ned i underjorden. Väktaren svor eden och
@@ -4554,7 +4116,7 @@ Den unge alfen fick tillåtelse att se Mimers drottnings och nattdisernas
 underbara boning. Där vid drottningens högsäte satt Baduhild, och en
 pilt lekte vid hennes knän. »Är han din son?» frågade Svipdag Baduhild.
 »Ja», svarade
-\protect\hypertarget{lb1625905.xhtmlux5cux23start121}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start121-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start121-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start121-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start121-d}{}{}
+
 hon. »Gossen har jag kallat Vidga. Du bör veta hans namn, ty du och han
 äro syskonbarn. Din fader var Egil; denne gosses fader var Valand.»
 
@@ -4592,7 +4154,7 @@ rysa i sömnlösa nätter. Skall en gudafiende uppväxa vid gudavännen
 Mimers härd invid Yggdrasils vördnadsbjudande stam, vid randen af den
 heliga visdomskällan? Skall Vidga växa upp för att fullgöra ett ogörligt
 värk, dö förbannad under gudarnes vapen och försändas till de plågor,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start122}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start122-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start122-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start122-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start122-d}{}{}
+
 som äro åt de förbannade bestämda? Förfärliga tankar! Egde jag
 silfverskäran, hvarmed jag kunde afskära den bloddränkta tråd, som Urd
 tvinnat åt Baduhilds son! Men skäran kommer aldrig i den hand, som Urd
@@ -4631,7 +4193,7 @@ deras urland Jotunheim. Äfven till Jotunheim begaf sig Svipdag, till den
 onde, mycket fruktade jotunfursten Gymer, och kallade därvarande
 jättestammar till strid. Han lofvade dem seger och sade sig ega det
 svärd, som deras förre
-öfverhöfding\protect\hypertarget{lb1625905.xhtmlux5cux23start123}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start123-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start123-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start123-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start123-d}{}{},
+öfverhöfding,
 hans farbroder Valand smidt, men aldrig hann begagna, ett svärd, som
 segern helt visst skulle följa.
 
@@ -4663,7 +4225,7 @@ hugg och Halfdans brynja var klufven och han själf sårad. Då kastade Tor
 sin hammare mot Svipdag. Han mötte den i flykten med hämdevapnet.
 Sindres bästa smide sammanstötte med Valands bästa. Nu stod den
 egentliga och afgörande domen öfver dem, och den lyktade så, att hammare
-\protect\hypertarget{lb1625905.xhtmlux5cux23start124}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start124-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start124-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start124-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start124-d}{}{}
+
 och hammarskaft splittrades och kom i obrukbara stycken tillbaka i
 asagudens hand, men Valandssvärdets egg hade icke fått en skåra. Tor var
 vapenlös och måste rygga. Han tog den sårade Halfdan på sin skuldra och
@@ -4698,16 +4260,16 @@ kunde göra sig till världens herre. Asgard bäfvade de dagarne på udden
 af Svipdags svärd. Dock -- han hade återskänkt Fröja till gudarne och
 trolofvat sig med henne. Kunde icke hans kärlek besegra hans
 maktlystnad? I detta fall skulle han varda välkommen till Asgard och
-erkännas\protect\hypertarget{lb1625905.xhtmlux5cux23start125}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start125-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start125-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start125-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start125-d}{}{}
+erkännas
 af gudarne som Fröjas make. Han var hvarken af asa- eller vanablod. Men
 en försoning med Ivaldes slägt och alferna var för gudarne önskvärd, och
 kunde den köpas med Svipdags upptagande i asarnes och vanernas slägt och
 med hämdesvärdets upptagande bland Asgardsklenoderna, så beredde det
 köpet vinning åt Oden och åt världen.
 
-\paragraph{XXXII.}
+\secII{}{XXXII.}
 
-\paragraph{SVIPDAG KOMMER TILL ASGÅRD. HANS FÄRD TILL BALDER.}
+\secII{}{SVIPDAG KOMMER TILL ASGÅRD. HANS FÄRD TILL BALDER.}
 
 Det var vid den tid på dygnet, då dvärgen, som står utanför
 morgonrodnadsalfen Dellings dörrar, sjunger väckelsesången öfver världen
@@ -4735,7 +4297,7 @@ lekslätter och Valaskjalfs silfvertak och Lidskjalfs torn glänsa i
 morgonbelysning. Han steg upp på den skans, som ligger midt för
 fallbryggan. Därifrån är utsigt öfver den konstrike porten till
 gudaborgarne
-\protect\hypertarget{lb1625905.xhtmlux5cux23start126}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start126-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start126-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start126-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start126-d}{}{}
+
 bakom vallmuren. Framför porten stod en väktare; strax innanför dess
 galler låg Odens ene ulfhund och sof; den andre var vaken och upphof ett
 skall. Midt emot Svipdag reste sig en guldsirad hall högt bakom en
@@ -4773,7 +4335,7 @@ råkar ut för dem. Och bakom dem finnas älfva väktare inne i borgen.»
 vaksamhet och fresta deras matlust, så att de glömma sin tjänst?»
 
 »Intet utom de läckra stekarne under Vidofners vingar.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start127}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start127-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start127-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start127-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start127-d}{}{}
+
 Kan du kasta dem till Gere och Freke, så glömma de sin tjänst, och du
 kan smyga dem förbi.»
 
@@ -4820,7 +4382,7 @@ upp af sig själf. Båda hundarne voro nu vakna, gingo fram till Svipdag,
 hälsade honom med muntra språng och slickade hans hand. Väktaren gick
 och sade Fröja, att en främling kommit, som helt visst är Svipdag. Då
 steg hon upp och skyndade ut till ynglingen. »Säg ditt
-\protect\hypertarget{lb1625905.xhtmlux5cux23start128}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start128-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start128-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start128-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start128-d}{}{}
+
 namn och din ätt», sade hon; »mina ögon vilja ha dina läppars
 vittnesbörd!»
 
@@ -4859,7 +4421,7 @@ samlade sig gudarne kring den fallne och beklagade hans död och prisade
 hans forna gärningar, då han var gudarnes vän och smyckegifvare. Och då
 hade Tor med sin faders bifall tagit Valands ögon och kastat dem till
 himmelen, för att de skulle varda stjärnor. Detta bevisade för Skade,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start129}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start129-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start129-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start129-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start129-d}{}{}
+
 att Valands minne var i Asgard äradt, och då Njord förnyade sitt
 friareanbud till henne, vardt hon rikedomsgudens maka.
 
@@ -4897,7 +4459,7 @@ steg ned i underjorden. Det var icke den, som från näjden af Ulfdalarne
 leder ned till Nifelheim och genom detta land öfver Nidafjället till
 Mimers rike. Nu red han nedför Bifrost och genom en östlig port -- den
 för de döde bestämde -- in i underjorden. Detta var närmaste
-\protect\hypertarget{lb1625905.xhtmlux5cux23start130}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start130-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start130-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start130-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start130-d}{}{}
+
 vägen till Mimers lund. Efter att hafva porten bakom sig, färdades
 Svipdag nio dygn genom djupa dalar och kom till en guldbelagd bro. Där
 satt Madgun, en af Urds diser, som brovaktare. Dånet af Sleipners hofvar
@@ -4929,7 +4491,7 @@ gudarnes bön. Nornorna rådgjorde. Därefter sade Urd: Balder får med
 Nanna återvända till Asgard, om ingen varelse är, som icke begråtit
 eller vill begråta, att Balder dött och ej skall återkomma.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start131}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start131-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start131-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start131-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start131-d}{}{}
+
 
 Med denna utsaga red Svipdag tillbaka. Han tänkte öfver Urds dom och
 tyckte väl stundom, att den var hård och gaf föga hopp, stundom att man
@@ -4950,9 +4512,9 @@ Hvem Töck var är ovisst. Säkert lär dock vara, att hon antingen var
 Gullveig eller Loke. Svipdag hade intet trösteligt svar att medföra till
 Asgard, men likväl kära hälsningar och minnen från Balder och Nanna.
 
-\paragraph{XXXIII.}
+\secII{}{XXXIII.}
 
-\paragraph{FRÖJ FRIAR TILL GERD.}
+\secII{}{FRÖJ FRIAR TILL GERD.}
 
 Fröj satt en dag i Lidskjalf och skådade ut öfver Midgard och Jotunheim.
 Då såg han i jättehöfdingen Gymers gård en mö, medan hon gick från salen
@@ -4963,7 +4525,7 @@ hatade jätten i Jotunheim. Ett rykte gick, att den pånyttfödda Gullveig
 blifvit hans hustru och att det var med henne han födt sin undersköna
 dotter, densamma som Fröj från Lidskjalf sett. Hennes namn var Gerd.
 Fröj
-\protect\hypertarget{lb1625905.xhtmlux5cux23start132}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start132-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start132-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start132-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start132-d}{}{}
+
 blygdes öfver den lidelse, som gripit honom till dottern af ett sådant
 par. Han förteg och bekämpade den. Men striden var gagnlös. Han var
 älskogssjuk och trånade bort. Njord och Skade bådo honom säga hvad det
@@ -5000,7 +4562,7 @@ Fröjs trånsjuka var honom af Gymer eller hans hustru -- om denna var
 Gullveig -- påhäxad, och de väntade intet godt för årsväxten i Midgard
 af en förbindelse mällan skördeguden och den höfdingeslägt i Jotunheim,
 som
-\protect\hypertarget{lb1625905.xhtmlux5cux23start133}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start133-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start133-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start133-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start133-d}{}{}
+
 efter Geirrauds och hans slägts utrotande var frostens och stormarnes
 egentlige härskare. Men här fanns intet val: Fröj skulle täras bort och
 dö, om gudarne ej bragte de offer, som kräfdes för en lycklig utgång af
@@ -5038,7 +4600,7 @@ skall, väckte Gerd och hennes tjenstemö. Denna såg ut och sade: »En
 yngling har kommit; han har redan stigit ur sadeln och släppt sin
 gångare att beta på gårdsplanen.» »Bjud honom in att dricka en bägare
 mjöd», sade Gerd; »hans ärende vill jag
-\protect\hypertarget{lb1625905.xhtmlux5cux23start134}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start134-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start134-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start134-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start134-d}{}{}
+
 veta, ehuru jag anar, att han är min broders bane.» Svipdag steg in.
 »Hvem är du», frågade Gerd, »alf eller asason eller en af de vise
 vaner?» Svipdag sade sig komma från Asgard, frambar friareärendet från
@@ -5078,7 +4640,7 @@ skola kröka dig ned i gyttjan. Tope (»Vanvett»), Ope (»Skakande Gråt»),
 Otåle (»Rastlös Oro») skola aldrig lämna dig i ro. En make skall du få,
 men aldrig en makes kärlek. Hustru skall du varda åt den trehöfdade
 Trudgelmer, åt honom,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start135}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start135-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start135-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start135-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start135-d}{}{}
+
 hvars fötter, såsom Ymers, föda barn. Hören mig, I alle Nifelheims
 bebyggare, hören mig, spöken af tursar och jättar, hören mig, Suttungs
 söner! Ja, hören mig äfven, I sälle, som bon i Mimers rike, nu då jag
@@ -5114,7 +4676,7 @@ Nej, Gymer såg Svipdag komma och hade länge väntat en böneman från Fröj.
 Han och Gullveig hade uppgjort sins emellan, huru Valandssvärdet, som
 gjorde Asgard oangripligt, skulle komma i jättevåld. Gerd var den
 skönaste mön i Jotunheim; men hennes hvita armar
-\protect\hypertarget{lb1625905.xhtmlux5cux23start136}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start136-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start136-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start136-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start136-d}{}{}
+
 hade icke utan Gullveigs trollkonst kastat ett sken öfver haf och
 himmel.
 
@@ -5151,7 +4713,7 @@ vidtog sina åtgärder därefter. Han kom på den aftalade dagen till Gymer
 och medförde Fröja. Men redan före dem hade Tor och Ull brutit upp till
 Jotunheim och på lönliga vägar kommit till grannskapet af Gymers
 fjällgård och
-\protect\hypertarget{lb1625905.xhtmlux5cux23start137}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start137-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start137-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start137-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start137-d}{}{}
+
 gömt sig där. Gymer emottog sändeskapet från Asgard väl och hedrade det
 med ett gille. Följande morgon skulle de återvända och medföra Gerd till
 Asgard. Då gillet var i full gång, tog Gymer Svipdag afsides och sade:
@@ -5186,7 +4748,7 @@ en gång af henne. Hon har nu en tid varit i Folkvang som Fröjas
 tjenarinna. Du känner ju Aurboda? Det är hon.» Svipdag vardt högligen
 förvånad öfver denna upptäckt.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start138}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start138-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start138-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start138-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start138-d}{}{}
+
 
 Gymer hade icke få salkämpar och äfven några gäster hos sig. Hans mening
 var, att när det druckits in på natten och glädjen stigit som högst mot
@@ -5221,11 +4783,11 @@ fränder» begaf sig Eggter till den ogenomtränglige Järnskogen. Där äro
 de ännu. På en kulle, under hvilken svärdet är nedgräfdt, djupt inne i
 denna obygd håller Eggter vakt intill Ragnarök.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start139}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start139-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start139-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start139-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start139-d}{}{}
 
-\paragraph{XXXIV.}
 
-\paragraph{BRYTNING MÄLLAN ASAR OCH VANER.}
+\secII{}{XXXIV.}
+
+\secII{}{BRYTNING MÄLLAN ASAR OCH VANER.}
 
 Gerd fördes af Asgardshjältarne till Folkvang. Där måste hon upplefva
 ett nytt ve. Det lät sig icke göra att dölja för gudarne, att Gerds
@@ -5257,7 +4819,7 @@ Tor kastade Leikin ned i Nifelheim. Hon stötte sin ena sida svårt och
 hennes benbyggnad bröts i fallet. Däraf kommer sig väl, att hon är till
 hälften svartblå, till hälften likblek, och att hon har en stupande
 gång. I Nifelheim gjorde henne
-\protect\hypertarget{lb1625905.xhtmlux5cux23start140}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start140-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start140-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start140-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start140-d}{}{}
+
 sjukdomsandarne till drottning. Lokes son, ulfven Fenrer, hade fått
 stanna i Asgard, emedan han i början var lekfull och syntes oskadlig;
 men hans fader såg med nöje, huru Fenrer växte och lofvade att med tiden
@@ -5293,7 +4855,7 @@ särskilda. Med afseende på Gullveigs onda gärningar kan man säga, att de
 falla tre onda tursakvinnor eller en enda till last. När fördenskull
 tvifvelsmål i denna punkt låta sig yppa, hade det varit bäst, att
 ordentlig ransakning med vittnesförhör och dom äfven denna gång
-företagits\protect\hypertarget{lb1625905.xhtmlux5cux23start141}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start141-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start141-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start141-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start141-d}{}{}
+företagits
 och att man därvid hållit sig ensamt till de gärningar, som den
 anklagade efter sin tredje pånyttfödelse troddes hafva begått.
 
@@ -5327,7 +4889,7 @@ För Fröj måste det varit hårdt att öfvervara denna rådplägning, eftersom
 den kärlek han hyste till Gerd här var föremål för undersökningar, som
 ej kunde annat än gräma honom. Också hade öfverläggningen icke räckt
 länge, innan han framlade sitt och de andre vanernas käromål i denna
-\protect\hypertarget{lb1625905.xhtmlux5cux23start142}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start142-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start142-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start142-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start142-d}{}{}
+
 sak. De hade beslutat fordra böter af asarne för det på hans svärmoder
 gångna dråpet.
 
@@ -5363,7 +4925,7 @@ var utjämnadt.
 Här syntes nu asar och vaner stå omedgörlige mot hvarandra. Men
 medgörlighet höfdes Oden i denna sak. Hvad som lades Gullveig med rätta
 till last var ond säjd och
-trolldom\protect\hypertarget{lb1625905.xhtmlux5cux23start143}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start143-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start143-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start143-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start143-d}{}{};
+trolldom;
 men den onda säjden hade ju af Oden själf pröfvats, då han sökte vinna
 Rinds gunst. Vanerna måste påminna härom, icke för att förbittra
 asafadern, som de vördade, men för att beveka hans sinne till billighet.
@@ -5388,9 +4950,9 @@ samma brott fläckade värdighet af gudars och människors fader. Efter
 detta beslut utrymde vanerna och alferna sina borgar i Asgard, och
 Asgardsporten stängdes efter dem.
 
-\paragraph{XXXV.}
+\secII{}{XXXV.}
 
-\paragraph{VÄRLDSKRIGET. VANERNA INTAGA ASGARD.}
+\secII{}{VÄRLDSKRIGET. VANERNA INTAGA ASGARD.}
 
 Oden sände bud till Mimer, lät honom veta hvad som skett och bad om hans
 råd. Det var tydligt, att genom brytningen mällan asar och vaner var
@@ -5398,7 +4960,7 @@ världsordningens och världsträdets bestånd än en gång hotadt. Komme det
 till krig emellan gudarne och en eller flere bland dem fölle, skulle
 detta lända till största men, ty hvar och en af dem är under denna
 världsålder nödvändig och har sitt kall att
-\protect\hypertarget{lb1625905.xhtmlux5cux23start144}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start144-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start144-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start144-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start144-d}{}{}
+
 uppfylla i det helas ordning. Mimer lofvade att försöka en medling; men
 misslyckades den och fiendtligheter utbröto, borde Oden och hans söner
 innestänga sig i Asgard och vaka öfver dess försvar, men icke göra
@@ -5433,7 +4995,7 @@ Med Oden kvarstannade i Asgard Tor, Tyr, Brage, Vidar, Vale och Forsete.
 Några asynjor förblefvo där äfven, men bland dem voro icke de förnämsta.
 Frigg ansåg sin systerplikt och sin härkomst från vanerna fordra, att
 hon slöte sig
-\protect\hypertarget{lb1625905.xhtmlux5cux23start145}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start145-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start145-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start145-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start145-d}{}{}
+
 till dem. Asgards drottning lämnade fördenskull sin make och följde sin
 broder Njord. Fröja följde också sin broder Fröj. De båda alferna
 Svipdag och Ull hade ställt sig på vanernas sida, såsom ju också var att
@@ -5467,7 +5029,7 @@ stämpla till gudarnes och världens fördärf. Skulle hon få göra detta i
 skydd af sin slägtförbindelse med vanerna, eller skulle desse kräfva
 böter för henne på nytt, ifall hon för sina onda gärningar blefve genom
 asarne än en gång
-\protect\hypertarget{lb1625905.xhtmlux5cux23start146}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start146-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start146-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start146-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start146-d}{}{}
+
 skild från lifvet? Hade icke vanerna gjort väl uti att afgifva en
 försäkran, att deras afsigt ej var sådan? Och då i öfrigt dessa
 Gullveigsbrännor visat sig tjena till intet, kunde vanerna ju
@@ -5503,7 +5065,7 @@ Rådstämman ändade med en ny afsättningsdom. Höner beröfvades sin
 värdighet af Vanaheims höfding, och vardt denna värdighet öfverlåten åt
 den stolte och hetsige Lodur. Åt Njord öfverläts att leda vanernas och
 alfernas fylkingar
-\protect\hypertarget{lb1625905.xhtmlux5cux23start147}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start147-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start147-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start147-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start147-d}{}{}
+
 i kriget, och skulle, om vanerna segrade, Njord, Fröj, Ull och Svipdag
 vara härrskare i Asgard.
 
@@ -5539,7 +5101,7 @@ förnimmas därinne som ett vattenfalls entonigt vyssande sång. Stundom
 prassla genom salarnes räcka nattdisernas steg, när de komma att
 betrakta sina fränder och bortfläkta dammet från deras mantlar och
 vapen.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start148}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start148-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start148-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start148-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start148-d}{}{}
+
 Så skola de sofva, tills Yggdrasil skälfver och Heimdallslurens
 världsgenomträngande klang väcker dem till den sista striden mällan det
 goda och det onda.
@@ -5576,7 +5138,7 @@ Från Bifrosts södra broände ryckte Njord med en stor här af Vanaheims
 och Alfheims stridsmän upp på Asgards vidsträckta utmärker. Oden och
 hans söner sågo från Lidskjalf och vallmuren en glänsande vapengördel
 bilda sig kring
-\protect\hypertarget{lb1625905.xhtmlux5cux23start149}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start149-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start149-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start149-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start149-d}{}{}
+
 dess borg, dock ännu på betydligt afstånd från densamma. Där stannade
 den länge och kom icke närmare. Men nattetid smögo Njords
 späjaretrupper, anförda af Fröj, Svipdag eller Ull, så nära som skenet
@@ -5610,7 +5172,7 @@ söner? Säkerligen icke.
 När asarne en mörk och stormig natt stigit upp från dryckesbordet och
 gjorde sin vanliga rund mällan borgarne och Asgardsvallen, upptäckte de
 till sin öfverraskning
-Sleipner\protect\hypertarget{lb1625905.xhtmlux5cux23start150}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start150-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start150-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start150-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start150-d}{}{}
+Sleipner
 gå inne på gårdsplanen. De drogo däraf den slutsats, att han slitit sig
 lös, sprungit ur vanalägret och satt öfver Asgardsmuren, för att
 återkomma till sin spilta och sina kamrater. Samtalande härom återvände
@@ -5645,7 +5207,7 @@ mällan strid och fritt aftåg ligger i din hand, ej i min. Jag sörjer
 för, att ditt namns ära ej skall minskas. Folken i Midgard skola i alla
 tider vörda det namnet.»
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start151}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start151-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start151-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start151-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start151-d}{}{}
+
 
 »Öppnen då edra fylkingar!» De öppnade sig, och med aktning sågo
 vanakrigarne den lilla asaflocken rida bort. Tor ensam vände om. Utanför
@@ -5681,11 +5243,11 @@ att Ull skulle göra det; och detta vardt rådstämmans beslut.
 På jorden hade händelser timat, som påkallade Svipdags värksamhet och
 närvaro där.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start152}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start152-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start152-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start152-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start152-d}{}{}
 
-\paragraph{XXXVI.}
 
-\paragraph{VÄRLDSKRIGET I MIDGARD. HADDINGS UNGDOMSÄFVENTYR.}
+\secII{}{XXXVI.}
+
+\secII{}{VÄRLDSKRIGET I MIDGARD. HADDINGS UNGDOMSÄFVENTYR.}
 
 Halfdan hade efterlämnat två söner: Gudhorm, son af Groa, således
 halfbroder till Svipdag, samt Hadding, son af växtlighetsdisen Alvig,
@@ -5715,7 +5277,7 @@ under ytan af hans glada, raska och behagliga väsen låg förborgadt något
 af hans farbroder Valands lynne. Svipdag tålde icke att höra Halfdan
 omtalas, och det var tydligt nog, att han på Hadding öfverflyttat det
 hat han
-\protect\hypertarget{lb1625905.xhtmlux5cux23start153}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start153-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start153-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start153-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start153-d}{}{}
+
 hyst till fadern. Alfernas lynne tros allmänt vara sådant, att de äro
 älsklige och välvillige mot dem, som ej förtörnat dem, men mot hvarje
 annan hämdgirige och svårblidkelige.
@@ -5749,7 +5311,7 @@ därmed sätta en evig skamfläck på sin ära. Hadding var icke längre trygg
 i Vagnhöfdes bärggård. Han var utsatt för Lokes snaror, ty denne hade
 utspanat hvar han var gömd. Så omsorgsfullt Vagnhöfde och hans dotter
 Hardgreip vakade öfver honom, kunde likväl deras
-\protect\hypertarget{lb1625905.xhtmlux5cux23start154}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start154-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start154-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start154-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start154-d}{}{}
+
 ögon icke alltid följa pilten, som längtade ut från bärggården, för att
 leka på ängarna därutanför och titta vid skogsbrynet in i hvad som för
 honom var en främmande värld. Då han, vaktad af Hardgreip, satt vid
@@ -5782,7 +5344,7 @@ band och bojor.
 
 Nu var det tid för Hadding att träda in på den lefnadsbana, som låg
 framför honom. De mål, som han hade att
-\protect\hypertarget{lb1625905.xhtmlux5cux23start155}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start155-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start155-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start155-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start155-d}{}{}
+
 sträfva till, var att hämna sin faders död och återbörda sin andel i
 väldet öfver de germaniska stammarne.
 
@@ -5818,7 +5380,7 @@ sitt svärd, gaf vidundret banehugg och åt, såsom Oden för ett sådant
 fall anvisat honom, dess hjärta. Han vardt därigenom vis och kunde tolka
 djurläten. När han utträdde ur hålan, såg han icke Loke, men en skara
 stridsmän ligga sofvande på marken. De voro alla
-\protect\hypertarget{lb1625905.xhtmlux5cux23start156}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start156-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start156-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start156-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start156-d}{}{}
+
 vederstyggliga med likbleka ansigten. Han erfor sedan, att de kallades
 baningar (»fördärfvare», »förpästare») och voro bröder till pästväsendet
 Leikin och söner af Loke med Gullveig. Odens galdersång följde Hadding
@@ -5853,7 +5415,7 @@ på lif och död. Emellertid vardt han inbjuden i mjödhallen och där
 fägnad. Hjältarne sågo, att han hade en ren och trofast blick och funno
 mer behag i hans väsen än i hans ankomst dit, ty de fruktade för
 Haddings lif. Deras fruktan var icke ogrundad. Tvekampen hölls,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start157}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start157-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start157-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start157-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start157-d}{}{}
+
 och Hadding dukade under för Vidgas öfverlägsna vapen. Då Vidga höjde
 svärdet till banehugg, ställde sig Hamal och Hildebrand framför honom
 och talade bevekande ord. Vidga stack då sitt svärd i skidan och räckte
@@ -5889,7 +5451,7 @@ Det nordiska urlandets, det västra och det östra Germaniens stammar voro
 således på antåg mot hvarandra. Valkyrior, sköna diser i hjälm och
 brynja, sågos rida genom luften. De kommo dels från Vanaheim och Asgard,
 dels från
-\protect\hypertarget{lb1625905.xhtmlux5cux23start158}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start158-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start158-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start158-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start158-d}{}{}
+
 det i öster belägna Manheim. Svipdag lät, genom de skalder, som följde
 hans och Gudhorms härar, förkunna för stridsmännen, att enligt
 gudarådets beslut skall enhvar, som på deras sida faller i de
@@ -5927,7 +5489,7 @@ Från Svitiod det stora kom Gudhorms fosterfader Hafle med jättemöarna
 Fenja och Menja till Gudhorms krigshär. Till Haddings kom från Svitiod
 det stora hans fosterfader Vagnhöfde med sin dotter Hardgreip, som var
 klädd i en
-\protect\hypertarget{lb1625905.xhtmlux5cux23start159}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start159-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start159-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start159-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start159-d}{}{}
+
 krigares drägt. Midgard hade ditintills aldrig och har sällan efteråt
 sett så stora härar som de, hvilka nu ryckte emot hvarandra. De sträckte
 sig öfver bärg och dalar. När de stodo i ordnade fylkingar till häst och
@@ -5961,7 +5523,7 @@ brynjor. Hardgreip kämpade bredvid Hadding. Den ena hären var den andra
 jämlik i mod och dödsförakt. Becke höll sig bakom stridslinien och
 undvek att råka in i kampens tummel. Under hela slaget drog han icke
 sitt svärd ur skidan och skulle varit den förste
-\protect\hypertarget{lb1625905.xhtmlux5cux23start160}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start160-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start160-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start160-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start160-d}{}{}
+
 att taga till flykten, om han sett de sinas leder vackla; men icke dess
 mindre bidrog han till den utgång slaget fick, ty han hade ordnat
 Gudhorms fylkingar med stor skicklighet, så att de på hans flygel bragte
@@ -5995,14 +5557,14 @@ men ur de sår hans vapen tillfogade spökhanden utrann mer etter än blod,
 och den grep med sina järnklor Hardgreip och sönderslet henne. När
 Hadding på detta sätt förlorat sin ledsagarinna, trodde han sig
 öfvergifven af alla. Men då kom
-\protect\hypertarget{lb1625905.xhtmlux5cux23start161}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start161-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start161-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start161-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start161-d}{}{}
+
 Heimdall, den skinande guden, och förde honom på en stig, där Hamal och
 Hildebrand återfunno honom. Heimdall följde städse sin ättlings öden och
 ingrep till hans bästa, när omständigheterna ovilkorligt kräfde det.
 
-\paragraph{XXXVII.}
+\secII{}{XXXVII.}
 
-\paragraph{VÄRLDSKRIGETS SLUT.}
+\secII{}{VÄRLDSKRIGETS SLUT.}
 
 Nu inträdde en mångårig fredstid, hvarunder Germanien styrdes af
 Svipdags underkonungar och jarlar. Själf hade han återvändt till Asgard,
@@ -6029,7 +5591,7 @@ stammarne, skulle vara en den skönaste kvinna, och enär hennes make
 aflidit, sände han Becke och sin son Randver att å hans vägnar fria till
 henne. Hon svarade ja och åtföljde sändemännen till Gudhorm. När de
 framkommit, sade Becke i hemlighet till denne, att
-Randver\protect\hypertarget{lb1625905.xhtmlux5cux23start162}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start162-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start162-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start162-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start162-d}{}{}
+Randver
 och Svanhild bedragit honom, samt att Svanhild bragt sin förre make om
 lifvet. Intetdera var sannt, men Becke förstod att göra det sannolikt,
 och Gudhorm lät då hänga sin ende son och kastade Svanhild att
@@ -6063,7 +5625,7 @@ fienderna, vaner och alfer, skulle de förhjälpa honom att återtaga sitt
 högsäte i Asgard. Men Oden, som tänkte mer på människornas väl än på sin
 egen makt och härrlighet, skyndade att underrätta vanerna om det anfall,
 som hotade, och
-\protect\hypertarget{lb1625905.xhtmlux5cux23start163}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start163-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start163-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start163-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start163-d}{}{}
+
 han lofvade dem sin hjälp, om de behöfde den. Den var högligen af nöden,
 ty de härmassor, som samlat sig i Jotunheim och ryckte dels mot Bifrosts
 norra brohufvud, dels öfver Elivågor in i Svitiod det stora, voro
@@ -6097,7 +5659,7 @@ fullbordan. Vanerna anse sig hafva fått bot för Gullveigs död; skulle
 hon pånyttfödas och åter visa sig, må hon icke brännas, utan förvisas
 till Järnskogen.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start164}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start164-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start164-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start164-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start164-d}{}{}
+
 
 Dessa villkor antogos, och asarne tågade på Bifrost tillbaka in i
 Asgard. Man såg därefter Tor och Ull, styffader och styfson, kämpa, som
@@ -6120,7 +5682,7 @@ Det återstod för gudarne en vigtig sak att ställa till rätta. Fred rådde
 nu i gudavärlden; men freden i Midgard hotades på nytt af fäjd mällan
 Halfdans söner. Det måste göras en ände på broderstriden, som nu igen
 höll på att flamma upp, ty Östgermaniens stammar samlade sig åter under
-Haddings fana. Gudarne läto Hadding veta, att \emph{de} icke skulle
+Haddings fana. Gudarne läto Hadding veta, att {\emph de} icke skulle
 ogilla, om han afstode från blodshämden, som ju vore omöjlig för en
 människa att fullgöra mot en Asgardsinnevånare och medlem af gudarnes
 krets. Då gick Hadding med sina rådgifvare Hamal och Hildebrand till
@@ -6132,7 +5694,7 @@ uppmanade nu Svipdag att bjuda Hadding försoning, och den andel, som
 tillkom honom af hans faders rike; men Svipdag genmälde, att han alldrig
 förnyar ett afslaget anbud. Asar och vaner gingo då till sina
 domaresäten och dömde
-\protect\hypertarget{lb1625905.xhtmlux5cux23start165}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start165-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start165-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start165-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start165-d}{}{}
+
 Svipdag att göra det. Men hvarken domen eller Fröjas tårar kunde beveka
 honom. Han begaf sig från Asgard ned till skandiska halfön och befallde
 sin son Asmund, som var svearnes konung, att samla sitt folk samt skicka
@@ -6165,7 +5727,7 @@ han visat sig vara mästare. Asmund skulle föra den i striden.
 
 Oden red därifrån till Haddings läger. Man väntade fältslag nästa
 morgon. Oden steg in i den gamle Hamals tält
-\protect\hypertarget{lb1625905.xhtmlux5cux23start166}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start166-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start166-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start166-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start166-d}{}{}
+
 och talade länge med honom. Han undervisade honom i ett ditintills icke
 kändt sätt att uppställa fylkingarna, ett sätt, som gjorde Beckes
 krigskunskap om intet. När han var förvissad om att Hamal fattat allt,
@@ -6199,7 +5761,7 @@ fällde allt omkring sig. Då ropade Hadding på asarnes bistånd, och
 plötsligt stod Vagnhöfde, ditförd af Oden, vid hans sida, svängande mot
 Asmund ett kroksvärd, medan Hadding kastade mot honom sitt spjut. Asmund
 stupade under
-\protect\hypertarget{lb1625905.xhtmlux5cux23start167}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start167-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start167-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start167-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start167-d}{}{}
+
 dessa vapen. Hadding trängde därefter fram mot Vidga Valandsson, som
 säges i detta fältslag ha med egen hand nedlagt flere hundra man. När
 han såg Hadding komma, svängde han om sin häst och flydde, och då
@@ -6235,7 +5797,7 @@ spred sig vida öfver hafvets spegel ett härrligt skimmer, som efteråt
 sällan varit sedt. Fröja bär alltsedan binamnet Mardöll
 (»Hafs-skimmer»). När vidundret var vaket, försökte hon vara glad och
 talade smeksamma ord. När det sof,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start168}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start168-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start168-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start168-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start168-d}{}{}
+
 kunde hon obemärkt hängifva sig åt sin sorg och gråta. Hvarje hennes tår
 vardt till en gulddroppe, som sjönk i hafvet, men ej gick förlorad, ty
 det droppade en lika tyngd af medlidande med Svipdag och henne in i
@@ -6268,7 +5830,7 @@ godt att hafva, för att ega en lösen för sitt lif, ty alla gudars vrede
 hvilade på honom, och han visste, att Oden numera kände sig obunden af
 den ed han svurit honom i tidernas morgon. Men äfven Heimdalls blick
 följde Hadding och såg hvad som föregick omkring honom. Medan Fröja
-\protect\hypertarget{lb1625905.xhtmlux5cux23start169}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start169-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start169-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start169-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start169-d}{}{}
+
 talade till Hadding, kröp en säl upp på Vågaskär och närmade sig
 Brisingamen. Det var Loke i sälham. Men från andra sidan kröp också en
 säl upp på klippan fram till smycket. En ham kan ej förvandla blicken,
@@ -6304,7 +5866,7 @@ stark järnkedja, hvarmed han lät binda sig, väl vetande, att han kunde
 spränga den, och det gjorde han i ett enda ryck. Nu gjordes en vida
 starkare, och ulfven, stolt öfver sin styrka, lät lägga henne kring sig.
 Med en
-\protect\hypertarget{lb1625905.xhtmlux5cux23start170}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start170-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start170-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start170-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start170-d}{}{}
+
 enda spänning kom han kedjan att brista, så att länkarne flögo åt alla
 håll. Svipdag begaf sig då till underjorden, för att rådgöra med de
 dvärgar, som plägat betjena Mimers söner i deras smedjor och ännu smidde
@@ -6336,7 +5898,7 @@ handen, och en krigaregud, saknande de fingrar, som gripa om
 svärdfästet, vore just ej häller någon förmån för Asgard. Fenrer
 tillade, att han trodde sig redan vara kommen till den ålder och styrka,
 att han kunde mäta sig med Tor.
-\protect\hypertarget{lb1625905.xhtmlux5cux23start171}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start171-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start171-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start171-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start171-d}{}{}
+
 Om någon tid skulle han nog kunna mäta sig med alla gudarne
 tillsammanstagna, och han ämnade då icke låta sig hållas inom ett
 stängsel, utan skulle han fordra samma frihet att gå lös som han hade
@@ -6370,7 +5932,7 @@ fradga, som bildar ån Von. Hålan närmast innanför bestämde gudarne åt
 Loke.
 
 Det gällde nu att fånga denne. Det dröjde länge, innan
-\protect\hypertarget{lb1625905.xhtmlux5cux23start172}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start172-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start172-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start172-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start172-d}{}{}
+
 så skedde, eftersom Loke kunde förvandla sig i flere slags djurskepnader
 och vistas i vattnet som på land. Men med dem, som ega denna förmåga, är
 det så stäldt, att de snart vantrifvas, om de icke allt emellanåt
@@ -6402,7 +5964,7 @@ lyckades lägga Loke i bojor, skulle han få en häst af skarpkantiga
 hällar att rida och Brages svärd stäldt med udden i hans rygg. Loke
 förstod ej antydningen, men begrep väl, att det låg hån i den, och han
 öfveröste först Brage, därefter
-samtliga\protect\hypertarget{lb1625905.xhtmlux5cux23start173}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start173-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start173-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start173-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start173-d}{}{}
+samtliga
 närvarande gudar och gudinnor, den tyste Vidar dock undantagen, med de
 värsta smädelser, och skröt med sina ogärningar. Därmed fortfor han
 ännu, när Tor steg in i salen. Äfven denne fick några stickord; men då
@@ -6435,7 +5997,7 @@ det var färdigt, gingo de ut, kastade nätet i forsen och drogo det ned
 efter älfven; Tor gick och drog vid ena älfkanten; några af asarne vid
 den andra. Medan de drogo, simmade Loke i laxskepnad framför nätet,
 tills han
-\protect\hypertarget{lb1625905.xhtmlux5cux23start174}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start174-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start174-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start174-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start174-d}{}{}
+
 kom till två nära hvarandra varande stenar. Mällan dem stannade han, och
 det gick som han beräknat: att nätet gled öfver och förbi honom. Gudarne
 märkte emällertid, att nätet rört vid något lefvande. De vände då om,
@@ -6466,7 +6028,7 @@ rygg, till hämd för att han bortröfvade Idun, och öfver hans ansikte
 fäste Skade en giftorm, som sprutar sitt etter ned mot hans mun, detta
 till straff för att Loke vållade Valands död. Men Sigyn håller en skål
 under etlerdropparne. När skålen är full och hon slår ut
-\protect\hypertarget{lb1625905.xhtmlux5cux23start175}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start175-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start175-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start175-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start175-d}{}{}
+
 ettret, kommer ormgiftet i hans mun. Då vrider sig Loke af smärta så
 våldsamt, att jorden skälfver. Så skall han ligga intill Ragnarök. Under
 tiden förvandla sig håren å hans hufvud till hornhårda spjut, som gömma
@@ -6501,7 +6063,7 @@ Gudarne ha haft en lärotid, äfven de. Den var nu fulländad.
 
 Sällan förete sig gudarne numera för människornas ögon. Förbindelsen dem
 emällan är dock alldrig afbruten. Den
-\protect\hypertarget{lb1625905.xhtmlux5cux23start176}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start176-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start176-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start176-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start176-d}{}{}
+
 upprätthålles genom böner, offer och tämpeltjänst, men framför allt
 genom en lefnad, som ställer sig Urds och gudarnes stadgar till
 efterrättelse. Dock händer någon gång, att när en germanhär rycker till
@@ -6535,7 +6097,7 @@ människofot. Mällan desse jättar och deras mänskliga grannar består ett
 tyst fördrag: om grannen icke oroar jätten eller hans boskap, oroar han
 ej häller grannen och hans egendom. Någon gång kan till och med välvilja
 och tjenstaktighet dem emällan råda. Oftare
-\protect\hypertarget{lb1625905.xhtmlux5cux23start177}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start177-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start177-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start177-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start177-d}{}{}
+
 händer dock, att jättar hemligen göra intrång på fördraget: att vackra
 människodöttrar bärgtagas af dem; att de förvända syn på ensamma
 vandrare och narra dem på villostigar, och att ifall de fått ett
@@ -6574,7 +6136,7 @@ Leikin vara ute, ridande på en trebent häst.
 Jägare och kolare må akta, att de icke låta bedraga sig af syner, som de
 få i skogen. En och annan af Gullveigs fränkor kan hålla till under
 furors och granars skymning och
-\protect\hypertarget{lb1625905.xhtmlux5cux23start178}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start178-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start178-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start178-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start178-d}{}{}
+
 framträda därur, för att locka med skenfagra behag. Framtill äro de
 vackra att skåda; men ryggsidan är ihålig som ett tråg. De kallas
 skogs-nufvor och skogs-rån.
@@ -6610,7 +6172,7 @@ att de blifvit skymda för människornas ögon (vid sol- och
 månförmörkelser). Fullt trygga känna sig sol- och månehästarnes länkare
 först, när de hunnit till varnernas skog i aftonrodnadsalfen Billings
 land. Varnerna äro aftonrodnadsalfens stridsmän. Sedan solen
-\protect\hypertarget{lb1625905.xhtmlux5cux23start179}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start179-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start179-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start179-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start179-d}{}{}
+
 gått till hvila, vaka de ännu öfver henne »med burna ljus och tända
 facklor», som kasta sitt sken på himmelen och förgylla kvällens skyar.
 
@@ -6618,9 +6180,9 @@ Till minne af det gamla fäderneslandet, af urfädernas grafvar och af de
 vigtiga händelser, som i urtiden timade på den skandiska halfön, bedja
 de söder om hafvet boende germanerna med anletet vändt emot Norden.
 
-\paragraph{XXXVIII.}
+\secII{}{XXXVIII.}
 
-\paragraph{NORNORNA. DOMEN ÖFVER DE DÖDE. SALIGHETS- OCH STRAFFORTERNA.}
+\secII{}{NORNORNA. DOMEN ÖFVER DE DÖDE. SALIGHETS- OCH STRAFFORTERNA.}
 
 Urd, ödets dis, är också dödens. Emedan hon bestämmer hvarje människas
 lefnadsöden och lefnadslängd, bestämmer hon äfven hennes dödsstund. Hon,
@@ -6644,7 +6206,7 @@ hennes fylgia eller haminga. Fylgiorna äro Urds tjenarinnor. När ett
 barn födes till världen, utser Urd åt det en fylgia, som då stiger upp
 ur underjorden vid västerns rand, sväfvar öfver hafvet och uppsöker sin
 skyddsling i Midgard och i osynlig måtto följer honom genom
-\protect\hypertarget{lb1625905.xhtmlux5cux23start180}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start180-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start180-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start180-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start180-d}{}{}
+
 lifvet, ser hans tankar, hviskar i hans samvete, manar och varnar honom
 i hans drömmar. Hvarje dag sväfva tusentals fylgior öfver vattnen till
 Midgard, och hvarje dag återvända tusental, för att bereda sina
@@ -6682,7 +6244,7 @@ sjukdomsandarne.
 Till en början vandra alla hädangångna en gemensam väg. En och samma
 färdeled är föreskrifven dem, och samma Helport öppnar sig dagligen för
 skaror af själar, som väntas
-\protect\hypertarget{lb1625905.xhtmlux5cux23start181}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start181-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start181-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start181-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start181-d}{}{}
+
 af olika lotter. Kvinnor och barn, ynglingar, män och ålderstigne, de
 som sysslat i fredliga värf och de som blodat vapnen, de som lefvat i
 enlighet med nornornas och gudarnes stadgar och de som brutit dem --
@@ -6715,7 +6277,7 @@ det är fullt af egghvassa järn. Fotsbreda ribbor flyta där, men bro
 finnes icke. Ribborna bära, när de barmhärtigas fötter stiga på dem, och
 föra dem oskadda öfver älfven. För de obarmhärtigas fötter slinta de
 undan; dessa falla i älfven och måste under svåra kval genomvada
-\protect\hypertarget{lb1625905.xhtmlux5cux23start182}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start182-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start182-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start182-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start182-d}{}{}
+
 den. Ehuru de förskräckligt sargas af järnen, synes dock däraf intet
 spår, när de kommit upp på stranden.
 
@@ -6751,7 +6313,7 @@ Kerlaug. När de andre asarne stiga af sina hästar, är äfven han framme,
 och aldrig har det å denna tingsstad händt, att rättens ledamöter låta
 vänta på sig.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start183}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start183-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start183-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start183-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start183-d}{}{}
+
 
 Oden sätter sig i högsätet och de andre asarne å rådstolar å ömse sidor.
 Framför dem sitta å sina bänkrader de döda, bleka och med märkena af den
@@ -6788,7 +6350,7 @@ denna omsorgs plikter. Då böra främlingar träda i fränders ställe. Det
 skick, hvari dessa döda anlända till tinget, visar bäst, om fromt
 sinnelag är rådande i Midgard. Ty ädla sinnen behjärta de råd, som så
 lyda: »Visa
-\protect\hypertarget{lb1625905.xhtmlux5cux23start184}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start184-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start184-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start184-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start184-d}{}{}
+
 de lik du finner på marken den sista tjänsten, de må vara sotdöda eller
 drunknade eller vapenfallna! Du skall göra bad åt dem, som äro döda, två
 deras händer och hufvud och kamma och torka dem, innan du lägger dem i
@@ -6824,7 +6386,7 @@ förgätenhet af det, som man kan erinra sig utan saknad eller ängslan.
 Drycken kallas »krafternas dryck» och är en blandning af safter ur de
 tre källor, som underhålla Yggdrasils lif: ur Urds och Mimers källor och
 ur Hvergelmer. Därför säges om
-densamma\protect\hypertarget{lb1625905.xhtmlux5cux23start185}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start185-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start185-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start185-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start185-d}{}{},
+densamma,
 att den består af »Urds kraft, köldkall sjö och Sons vätska». (Den
 köldkalla sjön är Hvergelmer och Son är ett af namnen på Mimers källa.)
 
@@ -6860,7 +6422,7 @@ förtälja.
 
 De svärdfallne, som valkyriorna ledsaga, göra halt på tingsplatsen,
 mötas där af sina fylgior och emottaga
-»krafternas\protect\hypertarget{lb1625905.xhtmlux5cux23start186}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start186-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start186-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start186-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start186-d}{}{}
+»krafternas
 dryck». Saknar en svärdfallen sin fylgia, måste han stiga ur sadeln och
 sätta sig på de dödas bänk; han är då visserligen en niding, och kan han
 ej med målrunor försvara sig, dömes han till pinovärldens kval. De
@@ -6894,7 +6456,7 @@ förbi Mimers med sjudubbel guldinfattning sirade källa, i hvilken
 Yggdrasils nedersta bladrika grenknippa speglar sig, och hvari dess
 mällersta rot nedsänker sina silfverhvita rottrådar; förbi de sofvande
 sju Mimersönernas tysta borg och förbi Natts och hennes
-\protect\hypertarget{lb1625905.xhtmlux5cux23start187}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start187-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start187-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start187-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start187-d}{}{}
+
 disers salar. Allt starkare förnimmes dånet af Hvergelmerkällans brus
 och världskvarnens gång, ty man nalkas Nidafjällets södra sluttning.
 Tåget går upp i denna fjälltrakt genom dälder och kjusor, där de från
@@ -6926,7 +6488,7 @@ genom hvilken den från Hvergelmer norrut flytande älfven Slid söker i
 dyig bädd sin väg. Det är där den rastlösa orons, själavåndans, den
 skakande gråtens och vanvettets demoner hafva sin hemstad; där som
 farsoternas och sjukdomarnes andar
-\protect\hypertarget{lb1625905.xhtmlux5cux23start188}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start188-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start188-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start188-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start188-d}{}{}
+
 bo med sin drottning, Lokedottern Leikin, hvars tröskel är fallförsåt
 och hvars bädd är sjukläger. Rymden är ständigt uppfylld af töcken.
 
@@ -6960,21 +6522,21 @@ Liknande straffhålor äro inrättade äfven inom Lyngveholmens bärg i
 Amsvartners haf för Lokes och Fenrers närmaste fränder,
 »världsfördärfvets söner» (Muspels söner).
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start189}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start189-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start189-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start189-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start189-d}{}{}
 
-\paragraph{XXXIX.}
 
-\paragraph{HÖGBEBYGGARNE.}
+\secII{}{XXXIX.}
+
+\secII{}{HÖGBEBYGGARNE.}
 
 Människan dör på samma gång »till Hel» och »till hög», till underjorden
 och till grafkullen. Hennes egentliga jag flyttar till underjorden; men
 hon har till en tid en dubbelgångare, ett andra jag i sin grift.
 
 Detta har sin förklaring i hennes naturs beståndsdelar. Så länge hon
-lefver på jorden, äro dessa säx till antalet: \emph{anden}, som är Odens
-gåfva; \emph{själen}, som är Höners gåfva; \emph{den efter gudaskepnaden
-bildade inre lekamen}, som är Lodurs skänk; \emph{blodet}, som äfven är
-skänkt af Lodur, samt \emph{växtkraft} och \emph{jordämne.} De båda
+lefver på jorden, äro dessa säx till antalet: {\emph anden}, som är Odens
+gåfva; {\emph själen}, som är Höners gåfva; {\emph den efter gudaskepnaden
+bildade inre lekamen}, som är Lodurs skänk; {\emph blodet}, som äfven är
+skänkt af Lodur, samt {\emph växtkraft} och {\emph jordämne.} De båda
 sistnämda funnos i Ask och Embla, medan de ännu voro träd, och de finnas
 i de på världsträdet vuxna frukter, som bäras af Höners bevingade
 tjenare till dem, som skola varda mödrar.
@@ -6996,7 +6558,7 @@ hans själ, och denna får, såsom redan är nämdt, en lit, som
 De i grafhögen gömda beståndsdelarna af den aflidne fortsätta en längre
 tid sin växelvärkan med hvarandra och bilda ett slags enhet, som bevarar
 något af hans personlighet och egenskaper, emedan de i jordelifvet varit
-genomträngda\protect\hypertarget{lb1625905.xhtmlux5cux23start190}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start190-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start190-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start190-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start190-d}{}{}
+genomträngda
 af hans ande och hans själ. Grafhögen kommer på detta sätt att innesluta
 en dubbelgängare af den till dödsriket nedstigne. Dubbelgängaren kallas
 »högbo», högbebyggare och draug. Draug betyder egentligen en från sin
@@ -7028,11 +6590,11 @@ och bönens, en tredje, som kan återkalla en död till jordelifvet. Det är
 besvärjelsens; men en dödsbesvärjelse är, såsom Hardgreips öde visat, en
 svår synd, som gör föröfvaren hemfallen åt straffandarne.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start191}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start191-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start191-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start191-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start191-d}{}{}
 
-\paragraph{XL.}
 
-\paragraph{RAGNARÖK. VÄRLDSFÖRNYELSEN.}
+\secII{}{XL.}
+
+\secII{}{RAGNARÖK. VÄRLDSFÖRNYELSEN.}
 
 Alla fel hafva långt räckande följder. Ondt aflar ondt. De fördärfvets
 frön, som Gullveig i tidernas morgon sådde i människornas sinnen, bära
@@ -7063,7 +6625,7 @@ Gnipahålan (»de stupande branternas håla») å Lyngveholmen, och Fenrers
 fränders från Järnskogen. Bland människorna råder förvildning. De döfva
 sin ångest i utsväfningar och blodbad. Sedernas band äro afkastade,
 urtidens heliga runor förgätna. Löften
-\protect\hypertarget{lb1625905.xhtmlux5cux23start192}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start192-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start192-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start192-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start192-d}{}{}
+
 och eder aktas icke, makar svika hvarandra, broder varder broders bane,
 och systrars söner utgjuta hvarandras blod.
 
@@ -7099,7 +6661,7 @@ söner, väckte af hornskallet, springa upp ur århundradens sömn. De fatta
 sina vapen och stiga till häst, för att deltaga i striden mot det onda.
 För dem gäller det främst att skydda underjordens gröna riken mot
 Nifelhels vidunderskaror. Dvärgarne
-\protect\hypertarget{lb1625905.xhtmlux5cux23start193}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start193-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start193-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start193-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start193-d}{}{}
+
 komma ut ur sina fjällboningar och stå ångestfulle vid sina bärgväggar.
 Lycksalighetsfältens fredliga innebyggare äro gripna af förskräckelse.
 Pinohålornas fångar komma lösa och storma, i förening med Nifelhels
@@ -7133,7 +6695,7 @@ Suttungssönerna. Njord har begifvit sig till Vanaheim; men Fröj, hans
 son, har stannat i Asgard, och han påyrkar att få sin plats mot Surt
 till bot för den dårskap, som bragte Valandssvärdet i jättevåld.
 
-\protect\hypertarget{lb1625905.xhtmlux5cux23start194}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start194-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start194-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start194-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start194-d}{}{}
+
 
 Efter slutadt ting tacka hvarandra gudarne för snart tilländalupen
 sammanlefnad och taga afsked af sina asynjor och diser.
@@ -7172,7 +6734,7 @@ gräsbevuxna Vide, sadlade han sin häst och iklädde sig sin rustning. Där
 band han på vänstra foten en märkvärdig sko, på hvilken osynliga händer
 arbetat under århundradenas lopp. Det förhåller sig med denna på
 följande sätt: Förfäderna hafva stadgat, att när skor göras,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start195}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start195-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start195-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start195-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start195-d}{}{}
+
 skola stycken af lädret afskäras vid tå och häl och förvaras åt
 fattigman. Den det gör, han ger osynligt ämne åt den sko, som skall
 skydda Vidars fot, när han ställer den i Fenrers öppna käftar. Af skons
@@ -7209,7 +6771,7 @@ Fenrer rasar i einheriarnes leder. Oden rider på Sleipner mot honom, men
 dignar framför odjurets ettersprutande gap och försvinner däri. Då
 kastar sig Vidar af sin häst, ställer vänstra foten på Fenrers underkäk,
 griper om hans
-\protect\hypertarget{lb1625905.xhtmlux5cux23start196}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start196-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start196-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start196-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start196-d}{}{}
+
 öfre med väldig hand och stöter svärdet i hans hjärta. Där håller guden
 vapnets udd kvar, tills ulfven tumlar på sidan och ligger död. Så hämnar
 Vidar den tyste sin fader. Oskadd går den starke och blygsamme asasonen
@@ -7244,7 +6806,7 @@ Leiftraser och Lif, som skola varda föräldrarna till den nya
 världsålderns människoslägte. Forsar falla från Nidafjällen, som nu
 öfverspännas af en högre himmel och öfver dem flyger, spanande efter
 fisk, det örnpar,
-\protect\hypertarget{lb1625905.xhtmlux5cux23start197}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start197-a}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start197-b}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start197-c}{}{}\protect\hypertarget{lb1625905.xhtmlux5cux23start197-d}{}{}
+
 som, i likhet med många andra djurslag, blifvit i Mimers rike förvaradt
 undan förstörelsen.
 
@@ -7265,15 +6827,15 @@ Vid kedjan af de heliga sånger, som diktades i urtiden och blifvit ärfda
 från slägte till slägte, har således nornan fäst det dyrbaraste af alla
 smycken, då hon sjöng, att
 
-{»all brist skall bättras}\\
-{och Balder komma.»}\\
+{»all brist skall bättras}
+{och Balder komma.»}
 
 Ja, hon har siat, att en mäktigare än han skall komma, den Gud, hvars
 tjenarinna Urd är, han, hvars ande genom visdomsbrunnen mängde sig in i
 skapelsen, en allsmäktig Gud och en fridens Gud tillika, som då
 
-{»stadgar en dyrkan,}\\
-{som stånda skall.»}\\
+{»stadgar en dyrkan,}
+{som stånda skall.»}
 
 
 \bye

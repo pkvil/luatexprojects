@@ -1,0 +1,510 @@
+% Macros för fädernas.tex
+
+%%
+%% Personal plain TeX macros.
+%% Can only be used with LuaTeX, requires luaotfload.sty in a searchable path.
+%%
+
+
+%%%%%%%%% F O N T S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Use font loader from ConTeXt
+\input luaotfload.sty
+
+% Font names
+
+\font\twelverm 	"DanteMTStd-Regular":+onum;+pnum;+tlig; at 12pt
+\font\twelveit 	"DanteMTStd-Italic" at 12pt
+\font\twelvesc 	"DanteMTStd-Regular":+smcp;+c2sc;letterspace=8; at 12pt
+\font\twelvetit "DanteMTStd-Regular":-titl;+upper;+lnum;letterspace=8; at 12.5pt
+\font\twelvetitb "DanteMTStd-Regular":+onum;-titl;letterspace=8; at 12pt
+
+
+\font\thirteenrm "DanteMTStd-Regular":+lnum;+pnum;letterspace=10; at 14pt
+\font\thirteenit "DanteMTStd-Italic" at 13pt
+\font\thirteensc "DanteMTStd-Regular":+onum;+pnum;+smcp;+c2sc;letterspace=10; at 13pt
+
+\font\fourteentit "DanteMTStd-Regular":+onum;-titl;letterspace=10; at 14pt
+\font\fourteensc "DanteMTStd-Regular":+smcp;+onum;letterspace=10; at 14pt
+\font\fourteenit "DanteMTStd-Italic":+onum;+pnum; at 14pt
+
+\font\fiftyfourtit "DanteMTStd-Regular":+titl at 54pt
+\font\dcquotefont "DanteMTStd-Regular":+titl at 25pt
+
+\def\dccapfont{\fiftyfourtit\red}
+
+\def\secIfontA{\thirteenrm}
+\def\secIfontB{\eighteenrm}
+
+\def\secIIfont{\twelvetit}
+
+% Semantic names for direct use
+
+\def\normalsize{%
+	\gdef\rm{\twelverm}%
+	\gdef\it{\twelveit}%
+	\gdef\sc{\twelvesc}%
+	\gdef\tit{\twelvetit}%
+}
+
+% Use italics for emphasis
+\def\emph{\it}
+
+% Start with normalsize roman
+\normalsize\rm
+
+
+%%%%%%%%% P A R A G R A P H   S E T T I N G S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Default distance between lines
+\baselineskip=14.06pt
+
+% Static height of first line
+\topskip=\baselineskip
+
+% No extra space after periods.
+\frenchspacing
+
+% Vertical distance between paragraphs
+\parskip=0pt
+
+% Paragraph indentation
+\parindent=1em
+
+% Lineskip & lineskiplimit
+\lineskiplimit=-\maxdimen
+\lineskip0pt
+
+% Badness
+\emergencystretch=0pt
+\pretolerance=150
+\tolerance=9999
+\hbadness=150
+\hfuzz=0pt
+
+% \firstnoindent -- Don't indent next paragraph
+\def\firstnoindent{\global\everypar={\wipeeverypar\setbox7=\lastbox}}
+\def\wipeeverypar{\global\everypar={}}
+
+% No penalties for widows and orphans, these are dealt with using \adjustpage
+\widowpenalty=0
+\clubpenalty=0
+
+%%%%%%%%% P A G E   L A Y O U T %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Paper size
+\pagewidth=150mm	
+\pageheight=225mm
+
+% Undo legacy 1in origin
+\pdfvariable horigin 0in	
+\pdfvariable vorigin 0in
+
+% Typeset area distance from top left corner
+\hoffset=\dimexpr(\pagewidth/9)\relax	
+\voffset=\dimexpr(\pageheight/9)\relax
+\advance\voffset by -\topskip
+\advance\voffset by 1ex
+
+
+% Ensure that first baseline starts at the same distance from the top
+\topskip=\baselineskip % I had an idea with this but forgot, leaving it in for now.
+
+% Typeset area size
+\hsize=\dimexpr(6\pagewidth/9)
+\vsize=\topskip \advance\vsize by 30\baselineskip
+
+% Backup original vsize 
+\newdimen\originalvsize \originalvsize=\vsize
+
+% Defines a macro \ap:<pageno>, expands to how many lines should be adjusted.
+\def\adjustpage#1#2{%
+	\expandafter\xdef\csname ap:#1\endcsname{#2}
+	\ifnum #1=1
+		\setvsize
+	\fi
+}
+% Example: \adjustpage{15}{+2} adjusts page 15 to have 2 extra lines
+
+% This macro gets expanded last in the output routine, don't use directly.
+\def\setvsize{%
+	\global\vsize=\originalvsize
+	\ifcsname ap:\the\pageno\endcsname
+		\global\advance \vsize by \csname ap:\the\pageno\endcsname \baselineskip
+	\fi
+}
+
+
+%%%%%%%%% H E A D E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\def\makeheadlineplain{%
+%	\vbox to0pt{%
+%		\vskip-22.5pt
+% 		\line{%
+%  			\vbox to8.5pt{}%
+%  			\the\headline
+%  		}%
+%  		\vss
+%  	}
+%	\nointerlineskip
+%}
+
+\def\makeheadline{%
+    \vbox to0pt{%
+        \vss
+        \hbox to\hsize{%
+            \the\headline
+        }%
+        \vskip-\topskip
+        \vskip0.5\baselineskip % raise or lower from default
+        \hbox{}%
+    }%
+    \nointerlineskip
+}
+
+\newif\ifheadline \headlinetrue
+
+\headline{%
+	\ifheadline
+		\ifodd\pageno
+			\hss \normalsize\sc \defaultcolor 
+			\lowercase{Name of the book} \hss% recto
+		\else
+			\hss \normalsize\sc \defaultcolor 
+			\lowercase{Author Authorsson}\hss% verso	
+		\fi
+	\else
+		\hss
+		\global\headlinetrue	
+	\fi
+}
+
+\headline{}
+
+% Turn off headline on current page
+\def\thispagenoheadline{\global\headlinefalse}
+
+
+%%%%%%%%% F O O T E R %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\makefootline{%
+	\baselineskip=14pt
+	\lineskiplimit=0pt
+	\line{%
+		\the\footline
+	}%
+}
+
+\newif\iffootline \footlinetrue
+
+\footline{%
+	\iffootline
+		\ifodd\pageno
+			\hss{\normalsize\rm \defaultcolor \folio\quad}% recto
+		\else
+			{\quad \normalsize\rm \defaultcolor \folio}\hss% verso	
+		\fi
+	\else
+		\hss
+		\global\footlinetrue	
+	\fi
+}
+
+% Turn off footline on current page
+\def\thispagenofootline{\global\footlinefalse}
+
+
+%%%%%%%%%% C O L O R S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Token for \aftergroup to reset color
+\def\colorstackpop{\pdfextension colorstack 0 pop}
+
+% Switch to CMYK color in current group. Expects four values between 0 and 1
+\def\setcmykcolor#1{%
+   	\pdfextension colorstack 0 push {#1 k #1 K}% 
+   	\aftergroup\colorstackpop
+}
+
+% Switch to RGB color in current group. Expects three values between 0 and 1
+\def\setrgbcolor#1{%
+   	\pdfextension colorstack 0 push {#1 rg #1 RG}% 
+   	\aftergroup\colorstackpop
+}
+
+% Color names
+\def\black{\setcmykcolor{0 0 0 1}}
+\def\blue{\setcmykcolor{1 1 0 0}}
+\def\red{\setrgbcolor{0.8 0 0}}
+
+% Semantic names for direct use
+\def\defaultcolor{\black}
+\def\hyperlinkcolor{\blue}
+\def\rubricationcolor{\red}
+
+% Example: {\hyperlinkcolor This is blue text}
+
+
+%%%%%%%%% I M A G E S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newdimen\imagewidth    \imagewidth=0pt 	% 0pt gives natural size of image
+\newdimen\imageheight   \imageheight=0pt
+\newtoks\imagedir		\imagedir{} 		% Must end with /, e.g. mypics/
+
+\def\image#1{%
+	\hbox{%
+		\saveimageresource 
+			\ifdim\imagewidth=0pt \else width\imagewidth\fi 
+            \ifdim\imageheight=0pt \else height\imageheight\fi 
+            {\the\imagedir#1}%
+      	\useimageresource\lastsavedimageresourceindex
+	}%
+}
+
+% Example: {\imageheight=4cm \image{mypicture.png}}
+
+%%%%%%%%% O U T P U T   R O U T I N E %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\output{\beforeoutput \plainoutput \afteroutput}
+
+% For two page layout, \shiftoffset is how much verso pages should move
+\newdimen\shiftoffset
+\shiftoffset = \pagewidth
+\advance \shiftoffset by -\hsize
+\advance \shiftoffset by -2\hoffset
+
+\def\beforeoutput{%
+	% Two page layout
+	\ifodd\pageno
+	\else
+		\advance \hoffset by \shiftoffset
+	\fi
+}
+
+\def\prepghook{\vbox to0pt{\kern-\voffset 
+   \hbox to0pt{\kern-\hoffset\background\hss}\vss}% 
+   \nointerlineskip 
+} 
+
+\def\background{%
+    \saveimageresource width\pagewidth height\pageheight {grid.pdf}%
+    \useimageresource\lastsavedimageresourceindex
+}
+
+% Turn off background image
+\def\background{}
+
+\def\plainoutput{\shipout\vbox{\prepghook\makeheadline\pagebody\makefootline}%
+  \advancepageno
+  \ifnum\outputpenalty>-20000 \else\dosupereject\fi}
+
+\def\afteroutput{%
+	% Manually overriding vsize to solve widows through \adjustpage
+	\setvsize
+}
+
+%%%%%%%%% S E C T I O N I N G %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\secI#1#2{%
+	\vfil\break
+	\ifodd\pageno
+	\else
+		\null\thispagenofootline
+		\vfill\eject
+	\fi
+	\centerline{\noindent\fourteensc \lowercase{#1}}
+	\vskip0.8\baselineskip
+	\centerline{\noindent\fourteentit \uppercase{#2}}
+	\vskip2.2\baselineskip
+}
+
+
+\def\secII#1#2{%
+	\vskip1\baselineskip
+	%\vskip1ex
+	{\twelvetit\red%\secIIfont\red
+	 \noindent 
+	 \if 😀#1😀\else
+	 	Kapitel #1\space\char"00B7 \space
+	 \fi
+	 \noindent #2\par%
+	}%
+	%\vskip1\baselineskip
+	%\vskip-1ex
+	\firstnoindent
+}
+
+%\def\secII#1#2{%
+%	\vskip\baselineskip
+%	%\vskip-1ex
+%	{\twelvetit\red
+%	 \noindent 
+%	 \if 😀#1😀\else
+%	 	Kapitel #1\space$\cdot$\space
+%	 \fi
+%	 \noindent #2\par%
+%	}%
+%	%\vskip1\baselineskip
+%	%\vskip1ex
+%	\firstnoindent
+%}
+
+%%%%%%%%% T A B L E   O F   C O N T E N T S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\ToCPartLine#1{%
+	\vskip0.5\baselineskip
+    {\twelvesc\uppercase{#1}}
+    \vskip0.5\baselineskip
+}
+
+% Fake page numbers for now
+\newcount\testpg \testpg=1
+
+\def\TocChapLine#1#2{{%
+	\advance\leftskip by 2em
+	\noindent\leavevmode
+	\rm
+	\llap{%
+		\hbox to 1em{\hfil #1}\quad
+	}%
+	\global\advance\testpg by 3\relax
+	#2\hfill \the\testpg\par
+}}
+
+%%%%%%%%% D R O P C A P S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\dropcapD{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-1pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont D}%
+}%
+\vskip-3\baselineskip
+\dimen0=39pt
+\dimen1=43pt
+\dimen2=43pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapF{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-1.5pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont F}%
+}%
+\vskip-3\baselineskip
+\dimen0=29pt
+\dimen1=32pt
+\dimen2=32pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapN{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-1pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont N}%
+}%
+\vskip-3\baselineskip
+\dimen0=42pt
+\dimen1=45pt
+\dimen2=45pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapO{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-2pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont O}%
+}%
+\vskip-3\baselineskip
+\dimen0=38pt
+\dimen1=45pt
+\dimen2=45pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapS{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-2pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont S}%
+}%
+\vskip-3\baselineskip
+\dimen0=23pt
+\dimen1=29pt
+\dimen2=29pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapT{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-2pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont T}%
+}%
+\vskip-3\baselineskip
+\dimen0=33.5pt
+\dimen1=33.5pt
+\dimen2=33.5pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapU{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-5pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont U}%
+}%
+\vskip-3\baselineskip
+\dimen0=34pt
+\dimen1=36pt
+\dimen2=36pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+
