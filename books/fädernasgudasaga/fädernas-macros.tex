@@ -16,16 +16,10 @@
 \font\twelverm 	"DanteMTStd-Regular":+onum;+pnum;+tlig; at 12pt
 \font\twelveit 	"DanteMTStd-Italic" at 12pt
 \font\twelvesc 	"DanteMTStd-Regular":+smcp;+c2sc;letterspace=8; at 12pt
-\font\twelvetit "DanteMTStd-Regular":-titl;+upper;+lnum;letterspace=8; at 12.5pt
-\font\twelvetitb "DanteMTStd-Regular":+onum;-titl;letterspace=8; at 12pt
+\font\twelvetit "DanteMTStd-Regular":-titl;+upper;+lnum;letterspace=8; at 12pt
 
-
-\font\thirteenrm "DanteMTStd-Regular":+lnum;+pnum;letterspace=10; at 14pt
-\font\thirteenit "DanteMTStd-Italic" at 13pt
-\font\thirteensc "DanteMTStd-Regular":+onum;+pnum;+smcp;+c2sc;letterspace=10; at 13pt
-
-\font\fourteentit "DanteMTStd-Regular":+onum;-titl;letterspace=10; at 14pt
-\font\fourteensc "DanteMTStd-Regular":+smcp;+onum;letterspace=10; at 14pt
+\font\fourteentit "DanteMTStd-Regular":color=000000;+upper;+onum;-titl;letterspace=10; at 15pt
+\font\fourteensc "DanteMTStd-Regular":color=000000;+c2sc;+smcp;+onum;letterspace=10; at 15pt
 \font\fourteenit "DanteMTStd-Italic":+onum;+pnum; at 14pt
 
 \font\fiftyfourtit "DanteMTStd-Regular":+titl at 54pt
@@ -108,7 +102,7 @@
 
 
 % Ensure that first baseline starts at the same distance from the top
-\topskip=\baselineskip % I had an idea with this but forgot, leaving it in for now.
+\topskip=\baselineskip
 
 % Typeset area size
 \hsize=\dimexpr(6\pagewidth/9)
@@ -235,13 +229,8 @@
 \def\black{\setcmykcolor{0 0 0 1}}
 \def\blue{\setcmykcolor{1 1 0 0}}
 \def\red{\setrgbcolor{0.8 0 0}}
-
-% Semantic names for direct use
 \def\defaultcolor{\black}
-\def\hyperlinkcolor{\blue}
-\def\rubricationcolor{\red}
-
-% Example: {\hyperlinkcolor This is blue text}
+% Example: {\blue This is blue text}
 
 
 %%%%%%%%% I M A G E S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -313,20 +302,24 @@
 		\null\thispagenofootline
 		\vfill\eject
 	\fi
+	%\imagewidth=\hsize
+	%\null\par
+	%\vskip-\baselineskip
+	%\vbox to 0pt{\vskip-1ex\image{headpiece3.pdf}\vss}
+	%\vskip5.25\baselineskip
 	\centerline{\noindent\fourteensc \lowercase{#1}}
-	\vskip0.8\baselineskip
+	\vskip0.5\baselineskip
 	\centerline{\noindent\fourteentit \uppercase{#2}}
-	\vskip2.2\baselineskip
+	\vskip1.5\baselineskip
 }
 
 
-\def\secII#1#2{%
-	\vskip1\baselineskip
+\def\beginSecII#1#2{%
+	%\vskip1\baselineskip
 	%\vskip1ex
-	{\twelvetit\red%\secIIfont\red
-	 \noindent 
+	{\twelveit\red%\secIIfont\red 
 	 \if 😀#1😀\else
-	 	Kapitel #1\space\char"00B7 \space
+	 	\noindent Kapitel #1\space\char"00B7 \space
 	 \fi
 	 \noindent #2\par%
 	}%
@@ -335,20 +328,24 @@
 	\firstnoindent
 }
 
-%\def\secII#1#2{%
-%	\vskip\baselineskip
-%	%\vskip-1ex
-%	{\twelvetit\red
-%	 \noindent 
-%	 \if 😀#1😀\else
-%	 	Kapitel #1\space$\cdot$\space
-%	 \fi
-%	 \noindent #2\par%
-%	}%
-%	%\vskip1\baselineskip
-%	%\vskip1ex
-%	\firstnoindent
-%}
+\def\beginSecII#1#2{%
+	\vskip1\baselineskip
+	\vskip1ex
+	\centerline{\twelvesc #1}
+	{\leftskip=2em plus 1fill \rightskip=\leftskip
+	 \twelvesc\noindent #2\par
+	}
+	\vskip1\baselineskip
+	\vskip-1ex
+	\firstnoindent
+}
+
+
+\def\endSecII{%
+%	\centerline{\lower0.6ex\hbox{*}}%
+}
+
+\def\sectionbreak{\centerline{M*m}}
 
 %%%%%%%%% T A B L E   O F   C O N T E N T S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -374,6 +371,25 @@
 
 %%%%%%%%% D R O P C A P S %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\def\dropcapA{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-1pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont A}%
+}%
+\vskip-3\baselineskip
+\dimen0=27pt
+\dimen1=36pt
+\dimen2=41pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
 \def\dropcapD{%
 \vskip2\baselineskip
 \smash{%
@@ -393,6 +409,25 @@
 \noindent
 }
 
+\def\dropcapE{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-1.5pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont E}%
+}%
+\vskip-3\baselineskip
+\dimen0=29pt
+\dimen1=34pt
+\dimen2=34pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
 \def\dropcapF{%
 \vskip2\baselineskip
 \smash{%
@@ -404,6 +439,82 @@
 \dimen0=29pt
 \dimen1=32pt
 \dimen2=32pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapG{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-2pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont G}%
+}%
+\vskip-3\baselineskip
+\dimen0=35.5pt
+\dimen1=41pt
+\dimen2=41pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapH{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-2pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont H}%
+}%
+\vskip-3\baselineskip
+\dimen0=42pt
+\dimen1=45pt
+\dimen2=45pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapL{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-1pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont L}%
+}%
+\vskip-3\baselineskip
+\dimen0=20pt
+\dimen1=37pt
+\dimen2=37pt
+\parshape 4
+    \dimen0 \dimexpr(\hsize-\dimen0)
+    \dimen1 \dimexpr(\hsize-\dimen1)
+    \dimen2 \dimexpr(\hsize-\dimen2)
+    0pt \hsize
+\noindent
+}
+
+\def\dropcapM{%
+\vskip2\baselineskip
+\smash{%
+    \hskip-1pt
+    \raise 21pt \llap{\dcquotefont \hskip0pt}%
+    {\dccapfont M}%
+}%
+\vskip-3\baselineskip
+\dimen0=47pt
+\dimen1=50pt
+\dimen2=50pt
 \parshape 4
     \dimen0 \dimexpr(\hsize-\dimen0)
     \dimen1 \dimexpr(\hsize-\dimen1)
