@@ -229,6 +229,7 @@
 \def\black{\setcmykcolor{0 0 0 1}}
 \def\blue{\setcmykcolor{1 1 0 0}}
 \def\red{\setrgbcolor{0.8 0 0}}
+\def\grey{\setrgbcolor{0.8 0.8 0.8}}
 \def\defaultcolor{\black}
 % Example: {\blue This is blue text}
 
@@ -277,12 +278,12 @@
 } 
 
 \def\background{%
-    \saveimageresource width\pagewidth height\pageheight {grid.pdf}%
+    \saveimageresource width\pagewidth height\pageheight {gridandgrey.pdf}%
     \useimageresource\lastsavedimageresourceindex
 }
 
 % Turn off background image
-\def\background{}
+%\def\background{}
 
 \def\plainoutput{\shipout\vbox{\prepghook\makeheadline\pagebody\makefootline}%
   \advancepageno
@@ -309,8 +310,13 @@
 	%\vskip5.25\baselineskip
 	\centerline{\noindent\fourteensc \lowercase{#1}}
 	\vskip0.5\baselineskip
-	\centerline{\noindent\fourteentit \uppercase{#2}}
-	\vskip1.5\baselineskip
+	{\advance\baselineskip by 3pt\relax 
+	 \leftskip 0pt plus 1fill \rightskip=\leftskip
+	\noindent\fourteentit \uppercase{#2}\par}
+	\dimen0=3pt
+	\multiply\dimen0 by \the\prevgraf
+	\vskip-\dimen0
+	\vskip0.5\baselineskip
 }
 
 
@@ -618,4 +624,17 @@
 \noindent
 }
 
+%%%%%
 
+%%% D E B U G
+
+\newcount\i
+
+\def\greylines{%
+	\i=31
+	\loop
+		\line{\grey\vrule height 1ex depth 0pt width \hsize}
+		\advance\i by-1 
+		\ifnum\i>0 
+	\repeat
+}
